@@ -54,7 +54,7 @@ func TestDecodeMessageData(t *testing.T) {
 	//      [(uint16(Capability.BASE.value), "1")],
 	//  )
 	//)
-	encodedHex := "01000000002d000000076d61696e6e657400000006302e302e333300000006312e322e313120fc010000000100010000000131"
+	encodedHex := "01000000002d000000076d61696e6e657400000006302e302e333300000006312e322e313125ce010000000100010000000131"
 
 	messageBytes, err := hex.DecodeString(encodedHex)
 	assert.NoError(t, err)
