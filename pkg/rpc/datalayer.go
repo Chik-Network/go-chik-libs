@@ -3,7 +3,7 @@ package rpc
 import (
 	"net/http"
 
-	"github.com/chia-network/go-chia-libs/pkg/rpcinterface"
+	"github.com/chik-network/go-chik-libs/pkg/rpcinterface"
 )
 
 // DataLayerService encapsulates data layer RPC methods

@@ -6,14 +6,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/chia-network/go-chia-libs/pkg/protocols"
-	"github.com/chia-network/go-chia-libs/pkg/streamable"
+	"github.com/chik-network/go-chik-libs/pkg/protocols"
+	"github.com/chik-network/go-chik-libs/pkg/streamable"
 )
 
 func TestRespondPeers(t *testing.T) {
 	// Has one peer in the list
 	// IP 1.2.3.4
-	// Port 8444
+	// Port 9678
 	// Timestamp 1643913969
 	hexStr := "0000000100000007312e322e332e3420fc0000000061fc22f1"
 
@@ -30,7 +30,7 @@ func TestRespondPeers(t *testing.T) {
 
 	pl1 := rp.PeerList[0]
 	assert.Equal(t, "1.2.3.4", pl1.Host)
-	assert.Equal(t, uint16(8444), pl1.Port)
+	assert.Equal(t, uint16(9678), pl1.Port)
 	assert.Equal(t, uint64(1643913969), pl1.Timestamp)
 
 	// Test going the other direction

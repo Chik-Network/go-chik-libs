@@ -1,7 +1,7 @@
 package peerprotocol
 
 import (
-	"github.com/chia-network/go-chia-libs/pkg/protocols"
+	"github.com/chik-network/go-chik-libs/pkg/protocols"
 )
 
 // FullNodeProtocol is for interfacing with full nodes via the peer protocol

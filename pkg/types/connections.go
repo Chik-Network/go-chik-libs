@@ -5,7 +5,7 @@ import (
 )
 
 // NodeType is the type of peer (farmer, full node, etc)
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/server/outbound_message.py#L12
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/server/outbound_message.py#L12
 type NodeType uint8
 
 const (
@@ -32,7 +32,7 @@ const (
 )
 
 // Connection represents a single peer or internal connection
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/rpc/rpc_server.py#L119
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/rpc/rpc_server.py#L119
 type Connection struct {
 	Type            NodeType  `json:"type"`
 	LocalPort       uint16    `json:"local_port"`

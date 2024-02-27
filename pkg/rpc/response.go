@@ -4,7 +4,7 @@ import (
 	"github.com/samber/mo"
 )
 
-// Response is the base response elements that may be in any response from an RPC server in Chia
+// Response is the base response elements that may be in any response from an RPC server in Chik
 type Response struct {
 	Success bool              `json:"success"`
 	Error   mo.Option[string] `json:"error,omitempty"`

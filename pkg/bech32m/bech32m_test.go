@@ -6,20 +6,20 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/chia-network/go-chia-libs/pkg/bech32m"
-	"github.com/chia-network/go-chia-libs/pkg/types"
+	"github.com/chik-network/go-chik-libs/pkg/bech32m"
+	"github.com/chik-network/go-chik-libs/pkg/types"
 )
 
 func TestKnownAddressConversions(t *testing.T) {
 	// Address: Hexstr
 	combinations := map[string]map[string]string{
-		"xch": {
-			"xch1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqm6ks6e8mvy": "000000000000000000000000000000000000000000000000000000000000dead",
-			"xch1arjpkq2a5kjd7t2st93wxqd0axcnfpq04xzyjespkr0xxakslcvq3wwwdh": "e8e41b015da5a4df2d505962e301afe9b134840fa984496601b0de6376d0fe18", // Random Keys
+		"xck": {
+			"xck1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqm6ksjy75z0": "000000000000000000000000000000000000000000000000000000000000dead",
+			"xck1arjpkq2a5kjd7t2st93wxqd0axcnfpq04xzyjespkr0xxakslcvqenhpru": "e8e41b015da5a4df2d505962e301afe9b134840fa984496601b0de6376d0fe18", // Random Keys
 		},
-		"txch": {
-			"txch1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqm6ksh7qddh": "000000000000000000000000000000000000000000000000000000000000dead",
-			"txch1arjpkq2a5kjd7t2st93wxqd0axcnfpq04xzyjespkr0xxakslcvquffcvy": "e8e41b015da5a4df2d505962e301afe9b134840fa984496601b0de6376d0fe18", // Random Keys
+		"txck": {
+			"txck1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqm6kslrezru": "000000000000000000000000000000000000000000000000000000000000dead",
+			"txck1arjpkq2a5kjd7t2st93wxqd0axcnfpq04xzyjespkr0xxakslcvq55shz0": "e8e41b015da5a4df2d505962e301afe9b134840fa984496601b0de6376d0fe18", // Random Keys
 		},
 	}
 

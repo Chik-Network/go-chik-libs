@@ -3,7 +3,7 @@ package types
 import (
 	"github.com/samber/mo"
 
-	"github.com/chia-network/go-chia-libs/pkg/tuple"
+	"github.com/chik-network/go-chik-libs/pkg/tuple"
 )
 
 // FarmerMissingSignagePoints is the struct representation of the missing signage points tuple
@@ -19,7 +19,7 @@ type EventFarmerNewSignagePoint struct {
 }
 
 // EventFarmerNewFarmingInfo is the event data for `new_farming_info` from the farmer
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/farmer/farmer_api.py#L535
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/farmer/farmer_api.py#L535
 type EventFarmerNewFarmingInfo struct {
 	FarmingInfo struct {
 		ChallengeHash Bytes32   `json:"challenge_hash"`
@@ -34,23 +34,23 @@ type EventFarmerNewFarmingInfo struct {
 }
 
 // EventFarmerSubmittedPartial is the event data for `submitted_partial` from the farmer
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/farmer/farmer_api.py#L270
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/farmer/farmer_api.py#L270
 type EventFarmerSubmittedPartial struct {
 	LauncherID                   Bytes32 `json:"launcher_id"`
 	PoolURL                      string  `json:"pool_url"`
-	CurrentDifficulty            uint64  `json:"current_difficulty"` // https://github.com/Chia-Network/chia-blockchain/blob/main/chia/protocols/pool_protocol.py#L97
+	CurrentDifficulty            uint64  `json:"current_difficulty"` // https://github.com/Chik-Network/chik-blockchain/blob/main/chik/protocols/pool_protocol.py#L97
 	PointsAcknowledgedSinceStart uint64  `json:"points_acknowledged_since_start"`
 }
 
 // EventFarmerProof is the farmer event `proof`
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/farmer/farmer_api.py#L367
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/farmer/farmer_api.py#L367
 type EventFarmerProof struct {
 	Proof        DeclareProofOfSpace `json:"proof"`
 	PassedFilter bool                `json:"passed_filter"`
 }
 
 // DeclareProofOfSpace matches to the farmer protocol type
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/protocols/farmer_protocol.py#L33
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/protocols/farmer_protocol.py#L33
 // @TODO Streamable
 type DeclareProofOfSpace struct {
 	ChallengeHash             Bytes32               `json:"challenge_hash"`

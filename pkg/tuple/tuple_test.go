@@ -8,7 +8,7 @@ import (
 	"github.com/samber/mo"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/chia-network/go-chia-libs/pkg/tuple"
+	"github.com/chik-network/go-chik-libs/pkg/tuple"
 )
 
 // basically the same as sent_to in transactions

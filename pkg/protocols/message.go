@@ -1,7 +1,7 @@
 package protocols
 
 import (
-	"github.com/chia-network/go-chia-libs/pkg/streamable"
+	"github.com/chik-network/go-chik-libs/pkg/streamable"
 
 	"github.com/samber/mo"
 )

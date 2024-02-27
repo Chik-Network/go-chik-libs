@@ -1,16 +1,16 @@
 # Streamable
 
-This package implements the chia streamable format. Not all aspects of the streamable format are fully implemented, and 
+This package implements the chik streamable format. Not all aspects of the streamable format are fully implemented, and 
 support for more types are added as protocol messages are added to this package. This is not intended to be used in
 consensus critical applications and there may be unexpected errors for untested streamable objects.
 
-For more information on the streamable format, see the [streamable docs](https://docs.chia.net/serialization-protocol?_highlight=strea#streamable-format)
+For more information on the streamable format, see the [streamable docs](https://docs.chiknetwork.com/serialization-protocol?_highlight=strea#streamable-format)
 
 ## How to Use
 
 When defining structs that are streamable, the order of the fields is extremely important, and should match the order
-of the fields in [chia-blockchain](https://github.com/chia-network/chia-blockchain). To support struct fields that are
-not defined in chia-blockchain, streamable objects require a `streamable` tag on each field of the struct that should be
+of the fields in [chik-blockchain](https://github.com/chik-network/chik-blockchain). To support struct fields that are
+not defined in chik-blockchain, streamable objects require a `streamable` tag on each field of the struct that should be
 streamed.
 
 **Example Type Definition:**

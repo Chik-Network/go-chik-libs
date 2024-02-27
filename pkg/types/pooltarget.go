@@ -1,7 +1,7 @@
 package types
 
 // PoolTarget PoolTarget
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/types/blockchain_format/pool_target.py#L12
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/types/blockchain_format/pool_target.py#L12
 // @TODO Streamable
 type PoolTarget struct {
 	PuzzleHash Bytes32 `json:"puzzle_hash"`

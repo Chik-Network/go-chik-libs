@@ -1,7 +1,7 @@
 package protocols
 
 import (
-	"github.com/chia-network/go-chia-libs/pkg/types"
+	"github.com/chik-network/go-chik-libs/pkg/types"
 )
 
 // RequestPeers is an empty struct

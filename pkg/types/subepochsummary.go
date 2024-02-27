@@ -5,7 +5,7 @@ import (
 )
 
 // SubEpochSummary sub epoch summary
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/types/blockchain_format/sub_epoch_summary.py#L13
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/types/blockchain_format/sub_epoch_summary.py#L13
 // @TODO Streamable
 type SubEpochSummary struct {
 	PrevSubEpochSummaryHash Bytes32           `json:"prev_subepoch_summary_hash"`

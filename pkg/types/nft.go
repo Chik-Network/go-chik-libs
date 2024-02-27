@@ -5,7 +5,7 @@ import (
 )
 
 // NFTInfo is an NFT
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/nft_wallet/nft_info.py#L21
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/wallet/nft_wallet/nft_info.py#L21
 // @TODO Streamable
 type NFTInfo struct {
 	LauncherID         Bytes32            `json:"launcher_id"`

@@ -9,9 +9,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// ChiaConfig the chia config.yaml
-type ChiaConfig struct {
-	ChiaRoot        string
+// ChikConfig the chik config.yaml
+type ChikConfig struct {
+	ChikRoot        string
 	DaemonPort      uint16          `yaml:"daemon_port"`
 	DaemonSSL       SSLConfig       `yaml:"daemon_ssl"`
 	Farmer          FarmerConfig    `yaml:"farmer"`
@@ -81,16 +81,16 @@ type SSLConfig struct {
 	PublicKey  string `yaml:"public_key"`
 }
 
-// GetChiaConfig returns a struct containing the config.yaml values
-func GetChiaConfig() (*ChiaConfig, error) {
-	rootPath, err := GetChiaRootPath()
+// GetChikConfig returns a struct containing the config.yaml values
+func GetChikConfig() (*ChikConfig, error) {
+	rootPath, err := GetChikRootPath()
 	if err != nil {
 		return nil, err
 	}
 
 	configPath := filepath.Join(rootPath, "config", "config.yaml")
 	if _, err = os.Stat(configPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("chia config file not found at %s. Ensure CHIA_ROOT is set to the correct chia root", configPath)
+		return nil, fmt.Errorf("chik config file not found at %s. Ensure CHIK_ROOT is set to the correct chik root", configPath)
 	}
 
 	configBytes, err := os.ReadFile(configPath)
@@ -98,22 +98,22 @@ func GetChiaConfig() (*ChiaConfig, error) {
 		return nil, err
 	}
 
-	config := &ChiaConfig{}
+	config := &ChikConfig{}
 
 	err = yaml.Unmarshal(configBytes, config)
 	if err != nil {
 		return nil, err
 	}
 
-	config.ChiaRoot = rootPath
+	config.ChikRoot = rootPath
 	config.fillDatabasePath()
 
 	return config, nil
 }
 
-// GetChiaRootPath returns the root path for the chia installation
-func GetChiaRootPath() (string, error) {
-	if root, ok := os.LookupEnv("CHIA_ROOT"); ok {
+// GetChikRootPath returns the root path for the chik installation
+func GetChikRootPath() (string, error) {
+	if root, ok := os.LookupEnv("CHIK_ROOT"); ok {
 		return root, nil
 	}
 
@@ -122,19 +122,19 @@ func GetChiaRootPath() (string, error) {
 		return "", err
 	}
 
-	root := filepath.Join(home, ".chia", "mainnet")
+	root := filepath.Join(home, ".chik", "mainnet")
 
 	return root, nil
 }
 
-// GetFullPath returns the full path to a particular filename within CHIA_ROOT
-func (c *ChiaConfig) GetFullPath(filename string) string {
+// GetFullPath returns the full path to a particular filename within CHIK_ROOT
+func (c *ChikConfig) GetFullPath(filename string) string {
 	if filepath.IsAbs(filename) {
 		return filename
 	}
-	return filepath.Join(c.ChiaRoot, filename)
+	return filepath.Join(c.ChikRoot, filename)
 }
 
-func (c *ChiaConfig) fillDatabasePath() {
+func (c *ChikConfig) fillDatabasePath() {
 	c.FullNode.DatabasePath = strings.Replace(c.FullNode.DatabasePath, "CHALLENGE", c.FullNode.SelectedNetwork, 1)
 }

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/chia-network/go-chia-libs/pkg/types"
+	"github.com/chik-network/go-chik-libs/pkg/types"
 	"github.com/samber/mo"
 	"github.com/stretchr/testify/require"
 )

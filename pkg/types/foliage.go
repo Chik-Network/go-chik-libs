@@ -5,7 +5,7 @@ import (
 )
 
 // FoliageBlockData FoliageBlockData
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/types/blockchain_format/foliage.py#L41
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/types/blockchain_format/foliage.py#L41
 // @TODO Streamable
 type FoliageBlockData struct {
 	UnfinishedRewardBlockHash Bytes32              `json:"unfinished_reward_block_hash"`
@@ -16,7 +16,7 @@ type FoliageBlockData struct {
 }
 
 // Foliage Foliage
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/types/blockchain_format/foliage.py#L52
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/types/blockchain_format/foliage.py#L52
 // @TODO Streamable
 type Foliage struct {
 	PrevBlockHash                    Bytes32              `json:"prev_block_hash"`
@@ -28,7 +28,7 @@ type Foliage struct {
 }
 
 // FoliageTransactionBlock foliage transaction block
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/types/blockchain_format/foliage.py#L29
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/types/blockchain_format/foliage.py#L29
 // @TODO Streamable
 type FoliageTransactionBlock struct {
 	PrevTransactionBlockHash Bytes32   `json:"prev_transaction_block_hash"`
@@ -40,7 +40,7 @@ type FoliageTransactionBlock struct {
 }
 
 // TransactionsInfo transactions info
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/types/blockchain_format/foliage.py#L17
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/types/blockchain_format/foliage.py#L17
 // @TODO Streamable
 type TransactionsInfo struct {
 	GeneratorRoot            Bytes32   `json:"generator_root"`

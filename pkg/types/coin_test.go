@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/chia-network/go-chia-libs/pkg/types"
+	"github.com/chik-network/go-chik-libs/pkg/types"
 )
 
 var (
@@ -34,7 +34,7 @@ func init() {
 	}
 }
 
-// TestCoinID coin id tests adapted from https://github.com/Chia-Network/chia_rs/blob/main/tests/test_coin.py
+// TestCoinID coin id tests adapted from https://github.com/Chik-Network/chik_rs/blob/main/tests/test_coin.py
 // With additional static/expected hex values of the coin ID, just for my own sanity
 // Static values computed using python like: Coin(parent_coin, puzzle_hash, 0xFF).name().hex()
 func TestCoinID(t *testing.T) {

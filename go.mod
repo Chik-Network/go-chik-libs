@@ -1,4 +1,4 @@
-module github.com/chia-network/go-chia-libs
+module github.com/chik-network/go-chik-libs
 
 go 1.18
 

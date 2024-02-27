@@ -5,7 +5,7 @@ import (
 )
 
 // ProofOfSpace Proof of Space
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/types/blockchain_format/proof_of_space.py#L20
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/types/blockchain_format/proof_of_space.py#L20
 // @TODO Streamable
 type ProofOfSpace struct {
 	Challenge              Bytes32              `json:"challenge"`

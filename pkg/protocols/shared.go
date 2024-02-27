@@ -6,7 +6,7 @@ package protocols
 const ProtocolVersion string = "0.0.33"
 
 // NodeType is the type of peer (farmer, full node, etc)
-// Source for node types is chia/server/outbound_messages.py
+// Source for node types is chik/server/outbound_messages.py
 type NodeType uint8
 
 const (
@@ -33,7 +33,7 @@ const (
 type CapabilityType uint16
 
 const (
-	// CapabilityTypeBase just means it supports the chia protocol at mainnet
+	// CapabilityTypeBase just means it supports the chik protocol at mainnet
 	CapabilityTypeBase CapabilityType = 1
 )
 

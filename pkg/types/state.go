@@ -5,13 +5,13 @@ import (
 )
 
 // WebsocketBlockchainState is how blockchain_state comes across in the websockets (wrapped)
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/rpc/full_node_rpc_api.py#L123
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/rpc/full_node_rpc_api.py#L123
 type WebsocketBlockchainState struct {
 	BlockchainState BlockchainState `json:"blockchain_state"`
 }
 
 // BlockchainState blockchain state
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/rpc/full_node_rpc_api.py#L123
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/rpc/full_node_rpc_api.py#L123
 type BlockchainState struct {
 	Difficulty                  uint64                 `json:"difficulty"`
 	GenesisChallengeInitialized bool                   `json:"genesis_challenge_initialized"`

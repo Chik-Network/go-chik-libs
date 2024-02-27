@@ -7,8 +7,8 @@ import (
 	"github.com/samber/mo"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/chia-network/go-chia-libs/pkg/protocols"
-	"github.com/chia-network/go-chia-libs/pkg/streamable"
+	"github.com/chik-network/go-chik-libs/pkg/protocols"
+	"github.com/chik-network/go-chik-libs/pkg/streamable"
 )
 
 const (
@@ -33,7 +33,7 @@ const (
 	//      "mainnet",
 	//      "0.0.33",
 	//      "1.2.11",
-	//      uint16(8444),
+	//      uint16(9678),
 	//      uint8(1),
 	//      [(uint16(Capability.BASE.value), "1")],
 	//  )
@@ -177,7 +177,7 @@ func TestUnmarshal_Handshake(t *testing.T) {
 	//      "mainnet",
 	//      "0.0.33",
 	//      "1.2.11",
-	//      uint16(8444),
+	//      uint16(9678),
 	//      uint8(1),
 	//      [(uint16(Capability.BASE.value), "1")],
 	//  )
@@ -187,7 +187,7 @@ func TestUnmarshal_Handshake(t *testing.T) {
 	assert.Equal(t, "mainnet", handshake.NetworkID)
 	assert.Equal(t, "0.0.33", handshake.ProtocolVersion)
 	assert.Equal(t, "1.2.11", handshake.SoftwareVersion)
-	assert.Equal(t, uint16(8444), handshake.ServerPort)
+	assert.Equal(t, uint16(9678), handshake.ServerPort)
 	assert.Equal(t, protocols.NodeTypeFullNode, handshake.NodeType)
 	assert.IsType(t, []protocols.Capability{}, handshake.Capabilities)
 	assert.Len(t, handshake.Capabilities, 1)

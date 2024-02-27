@@ -1,7 +1,7 @@
 package types
 
 // EventHarvesterFarmingInfo is the event data for `farming_info` from the harvester
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/harvester/harvester_api.py#L232
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/harvester/harvester_api.py#L232
 type EventHarvesterFarmingInfo struct {
 	ChallengeHash Bytes32 `json:"challenge_hash"`
 	TotalPlots    uint64  `json:"total_plots"`

@@ -3,11 +3,11 @@ package protocols
 import (
 	"github.com/samber/mo"
 
-	"github.com/chia-network/go-chia-libs/pkg/types"
+	"github.com/chik-network/go-chik-libs/pkg/types"
 )
 
 // Plot is the plot definition in the harvester protocol
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/protocols/harvester_protocol.py#L78
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/protocols/harvester_protocol.py#L78
 type Plot struct {
 	Filename               string                     `json:"filename"`
 	Size                   uint8                      `json:"size"`

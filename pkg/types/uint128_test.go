@@ -33,7 +33,7 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/chia-network/go-chia-libs/pkg/types"
+	"github.com/chik-network/go-chik-libs/pkg/types"
 )
 
 func randUint128(t *testing.T) types.Uint128 {

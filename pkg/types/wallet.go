@@ -1,8 +1,8 @@
 package types
 
 // WalletType types of wallets
-// This matches constants on the chia-blockchain end as well. Don't change to arbitrary values.
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/util/wallet_types.py#L12
+// This matches constants on the chik-blockchain end as well. Don't change to arbitrary values.
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/wallet/util/wallet_types.py#L12
 type WalletType uint8
 
 const (
@@ -47,7 +47,7 @@ const (
 )
 
 // WalletInfo single wallet record
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/wallet_info.py#L12
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/wallet/wallet_info.py#L12
 // @TODO Streamable
 type WalletInfo struct {
 	ID   uint32     `json:"id"`
@@ -57,7 +57,7 @@ type WalletInfo struct {
 }
 
 // WalletBalance specific wallet balance information
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/rpc/wallet_rpc_api.py#L721
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/rpc/wallet_rpc_api.py#L721
 type WalletBalance struct {
 	WalletID                 int32      `json:"wallet_id"`
 	Fingerprint              int        `json:"fingerprint"`

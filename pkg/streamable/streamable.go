@@ -7,7 +7,7 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/chia-network/go-chia-libs/pkg/util"
+	"github.com/chik-network/go-chik-libs/pkg/util"
 )
 
 const (

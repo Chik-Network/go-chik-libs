@@ -18,8 +18,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/chia-network/go-chia-libs/pkg/config"
-	"github.com/chia-network/go-chia-libs/pkg/types"
+	"github.com/chik-network/go-chik-libs/pkg/config"
+	"github.com/chik-network/go-chik-libs/pkg/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -60,8 +60,8 @@ func setup(t *testing.T) (*http.ServeMux, *httptest.Server, *Client) {
 	}
 
 	client, err := NewClient(ConnectionModeHTTP,
-		WithManualConfig(config.ChiaConfig{
-			ChiaRoot:   tmpDir,
+		WithManualConfig(config.ChikConfig{
+			ChikRoot:   tmpDir,
 			DaemonPort: portConf.RPCPort,
 			DaemonSSL:  sslConf,
 			Farmer: config.FarmerConfig{
@@ -99,7 +99,7 @@ func setup(t *testing.T) (*http.ServeMux, *httptest.Server, *Client) {
 }
 
 func generateSSLFiles() (string, error) {
-	dir, err := os.MkdirTemp("", "*-chia")
+	dir, err := os.MkdirTemp("", "*-chik")
 	if err != nil {
 		return "", err
 	}

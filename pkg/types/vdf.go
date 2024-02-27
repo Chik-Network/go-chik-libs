@@ -1,7 +1,7 @@
 package types
 
 // VDFInfo VDF Info
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/types/blockchain_format/vdf.py#L49
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/types/blockchain_format/vdf.py#L49
 // @TODO Streamable
 type VDFInfo struct {
 	Challenge          Bytes32           `json:"challenge"`
@@ -10,7 +10,7 @@ type VDFInfo struct {
 }
 
 // VDFProof VDF Proof
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/types/blockchain_format/vdf.py#L57
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/types/blockchain_format/vdf.py#L57
 // @TODO Streamable
 type VDFProof struct {
 	WitnessType          uint8 `json:"witness_type"`

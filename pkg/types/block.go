@@ -5,7 +5,7 @@ import (
 )
 
 // BlockRecord a single block record
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/consensus/block_record.py#L18
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/consensus/block_record.py#L18
 // @TODO Streamable
 type BlockRecord struct {
 	HeaderHash                 Bytes32                      `json:"header_hash"`
@@ -42,7 +42,7 @@ type BlockRecord struct {
 }
 
 // FullBlock a full block
-// https://github.com/Chia-Network/chia-blockchain/blob/0befdec071f49708e26c7638656874492c52600a/chia/types/full_block.py#L16
+// https://github.com/Chik-Network/chik-blockchain/blob/0befdec071f49708e26c7638656874492c52600a/chik/types/full_block.py#L16
 // @TODO Streamable
 type FullBlock struct {
 	FinishedSubSlots             []EndOfSubSlotBundle               `json:"finished_sub_slots"`
@@ -60,7 +60,7 @@ type FullBlock struct {
 }
 
 // RewardChainBlock Reward Chain Block
-// https://github.com/Chia-Network/chia-blockchain/blob/0befdec071f49708e26c7638656874492c52600a/chia/types/blockchain_format/reward_chain_block.py#L30
+// https://github.com/Chik-Network/chik-blockchain/blob/0befdec071f49708e26c7638656874492c52600a/chik/types/blockchain_format/reward_chain_block.py#L30
 // @TODO Streamable
 type RewardChainBlock struct {
 	Weight                     Uint128            `json:"weight"`
@@ -80,7 +80,7 @@ type RewardChainBlock struct {
 }
 
 // BlockCountMetrics metrics from get_block_count_metrics endpoint
-// https://github.com/Chia-Network/chia-blockchain/blob/0befdec071f49708e26c7638656874492c52600a/chia/rpc/full_node_rpc_api.py#L382
+// https://github.com/Chik-Network/chik-blockchain/blob/0befdec071f49708e26c7638656874492c52600a/chik/rpc/full_node_rpc_api.py#L382
 // Types are `int` in python, which is apparently unlimited in python3. Using uint64 as the largest native int in go
 type BlockCountMetrics struct {
 	CompactBlocks   uint64 `json:"compact_blocks"`
@@ -91,8 +91,8 @@ type BlockCountMetrics struct {
 // ReceiveBlockResult When Blockchain.receive_block(b) is called, one of these results is returned,
 // showing whether the block was added to the chain (extending the peak),
 // and if not, why it was not added.
-// These values match values in chia blockchain. Must not be arbitrarily changed
-// https://github.com/Chia-Network/chia-blockchain/blob/0befdec071f49708e26c7638656874492c52600a/chia/consensus/blockchain.py#L57
+// These values match values in chik blockchain. Must not be arbitrarily changed
+// https://github.com/Chik-Network/chik-blockchain/blob/0befdec071f49708e26c7638656874492c52600a/chik/consensus/blockchain.py#L57
 type ReceiveBlockResult uint8
 
 const (
@@ -113,7 +113,7 @@ const (
 )
 
 // BlockEvent data from block websocket event
-// https://github.com/Chia-Network/chia-blockchain/blob/0befdec071f49708e26c7638656874492c52600a/chia/full_node/full_node.py#L1784
+// https://github.com/Chik-Network/chik-blockchain/blob/0befdec071f49708e26c7638656874492c52600a/chik/full_node/full_node.py#L1784
 type BlockEvent struct {
 	TransactionBlock              bool                          `json:"transaction_block"`
 	KSize                         uint8                         `json:"k_size"`

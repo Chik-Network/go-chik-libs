@@ -4,20 +4,20 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/chia-network/go-chia-libs/pkg/config"
-	"github.com/chia-network/go-chia-libs/pkg/httpclient"
-	"github.com/chia-network/go-chia-libs/pkg/rpcinterface"
-	"github.com/chia-network/go-chia-libs/pkg/types"
-	"github.com/chia-network/go-chia-libs/pkg/websocketclient"
+	"github.com/chik-network/go-chik-libs/pkg/config"
+	"github.com/chik-network/go-chik-libs/pkg/httpclient"
+	"github.com/chik-network/go-chik-libs/pkg/rpcinterface"
+	"github.com/chik-network/go-chik-libs/pkg/types"
+	"github.com/chik-network/go-chik-libs/pkg/websocketclient"
 )
 
 // Client is the RPC client
 type Client struct {
-	config *config.ChiaConfig
+	config *config.ChikConfig
 
 	activeClient rpcinterface.Client
 
-	// Services for the different chia services
+	// Services for the different chik services
 	FullNodeService  *FullNodeService
 	WalletService    *WalletService
 	FarmerService    *FarmerService

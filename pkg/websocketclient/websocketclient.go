@@ -12,16 +12,16 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"github.com/chia-network/go-chia-libs/pkg/config"
-	"github.com/chia-network/go-chia-libs/pkg/rpcinterface"
-	"github.com/chia-network/go-chia-libs/pkg/types"
+	"github.com/chik-network/go-chik-libs/pkg/config"
+	"github.com/chik-network/go-chik-libs/pkg/rpcinterface"
+	"github.com/chik-network/go-chik-libs/pkg/types"
 )
 
-const origin string = "go-chia-rpc"
+const origin string = "go-chik-rpc"
 
-// WebsocketClient connects to Chia RPC via websockets
+// WebsocketClient connects to Chik RPC via websockets
 type WebsocketClient struct {
-	config  *config.ChiaConfig
+	config  *config.ChikConfig
 	baseURL *url.URL
 
 	daemonPort    uint16
@@ -41,7 +41,7 @@ type WebsocketClient struct {
 }
 
 // NewWebsocketClient returns a new websocket client that satisfies the rpcinterface.Client interface
-func NewWebsocketClient(cfg *config.ChiaConfig, options ...rpcinterface.ClientOptionFunc) (*WebsocketClient, error) {
+func NewWebsocketClient(cfg *config.ChikConfig, options ...rpcinterface.ClientOptionFunc) (*WebsocketClient, error) {
 	c := &WebsocketClient{
 		config: cfg,
 
@@ -116,15 +116,15 @@ func (c *WebsocketClient) Do(req *rpcinterface.Request, v interface{}) (*http.Re
 	case rpcinterface.ServiceDaemon:
 		destination = "daemon"
 	case rpcinterface.ServiceFullNode:
-		destination = "chia_full_node"
+		destination = "chik_full_node"
 	case rpcinterface.ServiceFarmer:
-		destination = "chia_farmer" // @TODO validate the correct string for this
+		destination = "chik_farmer" // @TODO validate the correct string for this
 	case rpcinterface.ServiceHarvester:
-		destination = "chia_harvester" // @TODO validate the correct string for this
+		destination = "chik_harvester" // @TODO validate the correct string for this
 	case rpcinterface.ServiceWallet:
-		destination = "chia_wallet"
+		destination = "chik_wallet"
 	case rpcinterface.ServiceCrawler:
-		destination = "chia_crawler"
+		destination = "chik_crawler"
 	default:
 		return nil, fmt.Errorf("unknown service")
 	}
@@ -146,8 +146,8 @@ func (c *WebsocketClient) Do(req *rpcinterface.Request, v interface{}) (*http.Re
 }
 
 // SubscribeSelf calls subscribe for any requests that this client makes to the server
-// Different from Subscribe with a custom service - that is more for subscribing to built in events emitted by Chia
-// This call will subscribe `go-chia-rpc` origin for any requests we specifically make of the server
+// Different from Subscribe with a custom service - that is more for subscribing to built in events emitted by Chik
+// This call will subscribe `go-chik-rpc` origin for any requests we specifically make of the server
 func (c *WebsocketClient) SubscribeSelf() error {
 	return c.Subscribe(origin)
 }
@@ -248,7 +248,7 @@ func (c *WebsocketClient) reconnectLoop() {
 func (c *WebsocketClient) initialKeyPairs() error {
 	var err error
 
-	c.daemonKeyPair, err = c.config.DaemonSSL.LoadPrivateKeyPair(c.config.ChiaRoot)
+	c.daemonKeyPair, err = c.config.DaemonSSL.LoadPrivateKeyPair(c.config.ChikRoot)
 	if err != nil {
 		return err
 	}

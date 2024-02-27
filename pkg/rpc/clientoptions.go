@@ -4,21 +4,21 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/chia-network/go-chia-libs/pkg/config"
-	"github.com/chia-network/go-chia-libs/pkg/httpclient"
-	"github.com/chia-network/go-chia-libs/pkg/rpcinterface"
+	"github.com/chik-network/go-chik-libs/pkg/config"
+	"github.com/chik-network/go-chik-libs/pkg/httpclient"
+	"github.com/chik-network/go-chik-libs/pkg/rpcinterface"
 )
 
-// WithAutoConfig automatically loads chia config from CHIA_ROOT
+// WithAutoConfig automatically loads chik config from CHIK_ROOT
 func WithAutoConfig() rpcinterface.ConfigOptionFunc {
-	return func() (*config.ChiaConfig, error) {
-		return config.GetChiaConfig()
+	return func() (*config.ChikConfig, error) {
+		return config.GetChikConfig()
 	}
 }
 
 // WithManualConfig allows supplying a manual configuration for the RPC client
-func WithManualConfig(cfg config.ChiaConfig) rpcinterface.ConfigOptionFunc {
-	return func() (*config.ChiaConfig, error) {
+func WithManualConfig(cfg config.ChikConfig) rpcinterface.ConfigOptionFunc {
+	return func() (*config.ChikConfig, error) {
 		return &cfg, nil
 	}
 }

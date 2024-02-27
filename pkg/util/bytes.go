@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/chia-network/go-chia-libs/pkg/types"
+	"github.com/chik-network/go-chik-libs/pkg/types"
 )
 
 // FormatBytes takes bytes as input and outputs a human friendly version

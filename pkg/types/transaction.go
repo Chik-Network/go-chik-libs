@@ -5,11 +5,11 @@ import (
 
 	"github.com/samber/mo"
 
-	"github.com/chia-network/go-chia-libs/pkg/tuple"
+	"github.com/chik-network/go-chik-libs/pkg/tuple"
 )
 
 // TransactionRecord Single Transaction
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/transaction_record.py#L26
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/wallet/transaction_record.py#L26
 // @TODO Streamable
 type TransactionRecord struct {
 	ConfirmedAtHeight uint32                   `json:"confirmed_at_height"`
@@ -95,7 +95,7 @@ type MemoTuple struct {
 }
 
 // MempoolInclusionStatus status of being included in the mempool
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/types/mempool_inclusion_status.py#L6
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/types/mempool_inclusion_status.py#L6
 type MempoolInclusionStatus uint8
 
 const (
@@ -110,7 +110,7 @@ const (
 )
 
 // TransactionType type of transaction
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/wallet/util/transaction_type.py#L6
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/wallet/util/transaction_type.py#L6
 type TransactionType uint32
 
 const (
@@ -134,7 +134,7 @@ const (
 )
 
 // SpendBundle Spend Bundle
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/types/spend_bundle.py#L20
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/types/spend_bundle.py#L20
 // @TODO Streamable
 type SpendBundle struct {
 	CoinSpends          []CoinSpend `json:"coin_spends"`

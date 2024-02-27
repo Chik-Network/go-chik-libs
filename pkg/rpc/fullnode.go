@@ -5,8 +5,8 @@ import (
 
 	"github.com/samber/mo"
 
-	"github.com/chia-network/go-chia-libs/pkg/rpcinterface"
-	"github.com/chia-network/go-chia-libs/pkg/types"
+	"github.com/chik-network/go-chik-libs/pkg/rpcinterface"
+	"github.com/chik-network/go-chik-libs/pkg/types"
 )
 
 // FullNodeService encapsulates full node RPC methods

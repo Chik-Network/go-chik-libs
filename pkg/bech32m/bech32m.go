@@ -25,7 +25,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/chia-network/go-chia-libs/pkg/types"
+	"github.com/chik-network/go-chik-libs/pkg/types"
 )
 
 var charset = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"

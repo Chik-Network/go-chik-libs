@@ -5,8 +5,8 @@ import (
 
 	"github.com/samber/mo"
 
-	"github.com/chia-network/go-chia-libs/pkg/rpcinterface"
-	"github.com/chia-network/go-chia-libs/pkg/types"
+	"github.com/chik-network/go-chik-libs/pkg/rpcinterface"
+	"github.com/chik-network/go-chik-libs/pkg/types"
 )
 
 // WalletService encapsulates wallet RPC methods
@@ -702,7 +702,7 @@ type SendTransactionMultiResponse struct {
 }
 
 // SendTransactionMulti allows sending a more detailed transaction with multiple inputs/outputs.
-// Options are the same as create signed transaction since this is ultimately just a wrapper around that in Chia
+// Options are the same as create signed transaction since this is ultimately just a wrapper around that in Chik
 func (s *WalletService) SendTransactionMulti(opts *CreateSignedTransactionOptions) (*SendTransactionMultiResponse, *http.Response, error) {
 	request, err := s.NewRequest("send_transaction_multi", opts)
 	if err != nil {

@@ -12,13 +12,13 @@ import (
 
 	"github.com/google/go-querystring/query"
 
-	"github.com/chia-network/go-chia-libs/pkg/config"
-	"github.com/chia-network/go-chia-libs/pkg/rpcinterface"
+	"github.com/chik-network/go-chik-libs/pkg/config"
+	"github.com/chik-network/go-chik-libs/pkg/rpcinterface"
 )
 
-// HTTPClient connects to Chia RPC via standard HTTP requests
+// HTTPClient connects to Chik RPC via standard HTTP requests
 type HTTPClient struct {
-	config  *config.ChiaConfig
+	config  *config.ChikConfig
 	baseURL *url.URL
 
 	// If set > 0, will configure http requests with a cache
@@ -53,7 +53,7 @@ type HTTPClient struct {
 }
 
 // NewHTTPClient returns a new HTTP client that satisfies the rpcinterface.Client interface
-func NewHTTPClient(cfg *config.ChiaConfig, options ...rpcinterface.ClientOptionFunc) (*HTTPClient, error) {
+func NewHTTPClient(cfg *config.ChikConfig, options ...rpcinterface.ClientOptionFunc) (*HTTPClient, error) {
 	c := &HTTPClient{
 		config: cfg,
 
@@ -188,7 +188,7 @@ func (c *HTTPClient) generateHTTPClientForService(service rpcinterface.ServiceTy
 	switch service {
 	case rpcinterface.ServiceFullNode:
 		if c.nodeKeyPair == nil {
-			c.nodeKeyPair, err = c.config.FullNode.SSL.LoadPrivateKeyPair(c.config.ChiaRoot)
+			c.nodeKeyPair, err = c.config.FullNode.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
 			if err != nil {
 				return nil, err
 			}
@@ -196,7 +196,7 @@ func (c *HTTPClient) generateHTTPClientForService(service rpcinterface.ServiceTy
 		keyPair = c.nodeKeyPair
 	case rpcinterface.ServiceFarmer:
 		if c.farmerKeyPair == nil {
-			c.farmerKeyPair, err = c.config.Farmer.SSL.LoadPrivateKeyPair(c.config.ChiaRoot)
+			c.farmerKeyPair, err = c.config.Farmer.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
 			if err != nil {
 				return nil, err
 			}
@@ -204,7 +204,7 @@ func (c *HTTPClient) generateHTTPClientForService(service rpcinterface.ServiceTy
 		keyPair = c.farmerKeyPair
 	case rpcinterface.ServiceHarvester:
 		if c.harvesterKeyPair == nil {
-			c.harvesterKeyPair, err = c.config.Harvester.SSL.LoadPrivateKeyPair(c.config.ChiaRoot)
+			c.harvesterKeyPair, err = c.config.Harvester.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
 			if err != nil {
 				return nil, err
 			}
@@ -212,7 +212,7 @@ func (c *HTTPClient) generateHTTPClientForService(service rpcinterface.ServiceTy
 		keyPair = c.harvesterKeyPair
 	case rpcinterface.ServiceWallet:
 		if c.walletKeyPair == nil {
-			c.walletKeyPair, err = c.config.Wallet.SSL.LoadPrivateKeyPair(c.config.ChiaRoot)
+			c.walletKeyPair, err = c.config.Wallet.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
 			if err != nil {
 				return nil, err
 			}
@@ -220,11 +220,11 @@ func (c *HTTPClient) generateHTTPClientForService(service rpcinterface.ServiceTy
 		keyPair = c.walletKeyPair
 	case rpcinterface.ServiceCrawler:
 		if c.crawlerKeyPair == nil {
-			c.crawlerKeyPair, err = c.config.Seeder.CrawlerConfig.SSL.LoadPrivateKeyPair(c.config.ChiaRoot)
+			c.crawlerKeyPair, err = c.config.Seeder.CrawlerConfig.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
 			if err != nil {
 				// Fall back to just using the full node certs in this case
 				// This should only happen on old installations that didn't have the crawler in the config initially
-				c.crawlerKeyPair, err = c.config.FullNode.SSL.LoadPrivateKeyPair(c.config.ChiaRoot)
+				c.crawlerKeyPair, err = c.config.FullNode.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
 				if err != nil {
 					return nil, err
 				}
@@ -233,7 +233,7 @@ func (c *HTTPClient) generateHTTPClientForService(service rpcinterface.ServiceTy
 		keyPair = c.crawlerKeyPair
 	case rpcinterface.ServiceDataLayer:
 		if c.datalayerKeyPair == nil {
-			c.datalayerKeyPair, err = c.config.DataLayer.SSL.LoadPrivateKeyPair(c.config.ChiaRoot)
+			c.datalayerKeyPair, err = c.config.DataLayer.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
 			if err != nil {
 				return nil, err
 			}
@@ -248,7 +248,7 @@ func (c *HTTPClient) generateHTTPClientForService(service rpcinterface.ServiceTy
 	transport = &http.Transport{
 		TLSClientConfig: &tls.Config{
 			Certificates:       []tls.Certificate{*keyPair},
-			InsecureSkipVerify: true, // Cert is apparently for chia.net - can't validate until it matches hostname
+			InsecureSkipVerify: true, // Cert is apparently for chiknetwork.com - can't validate until it matches hostname
 		},
 	}
 

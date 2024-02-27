@@ -11,13 +11,13 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"github.com/chia-network/go-chia-libs/pkg/config"
-	"github.com/chia-network/go-chia-libs/pkg/protocols"
+	"github.com/chik-network/go-chik-libs/pkg/config"
+	"github.com/chik-network/go-chik-libs/pkg/protocols"
 )
 
 // Connection represents a connection with a peer and enables communication
 type Connection struct {
-	chiaConfig *config.ChiaConfig
+	chikConfig *config.ChikConfig
 
 	peerIP      *net.IP
 	peerPort    uint16
@@ -33,13 +33,13 @@ type PeerResponseHandlerFunc func(*protocols.Message, error)
 
 // NewConnection creates a new connection object with the specified peer
 func NewConnection(ip *net.IP, options ...ConnectionOptionFunc) (*Connection, error) {
-	cfg, err := config.GetChiaConfig()
+	cfg, err := config.GetChikConfig()
 	if err != nil {
 		return nil, err
 	}
 
 	c := &Connection{
-		chiaConfig: cfg,
+		chikConfig: cfg,
 		peerIP:     ip,
 		peerPort:   cfg.FullNode.Port,
 	}
@@ -70,7 +70,7 @@ func NewConnection(ip *net.IP, options ...ConnectionOptionFunc) (*Connection, er
 func (c *Connection) loadKeyPair() error {
 	var err error
 
-	c.peerKeyPair, err = c.chiaConfig.FullNode.SSL.LoadPublicKeyPair(c.chiaConfig.ChiaRoot)
+	c.peerKeyPair, err = c.chikConfig.FullNode.SSL.LoadPublicKeyPair(c.chikConfig.ChikRoot)
 	if err != nil {
 		return err
 	}
@@ -122,7 +122,7 @@ func (c *Connection) Close() {
 func (c *Connection) Handshake() error {
 	// Handshake
 	handshake := &protocols.Handshake{
-		NetworkID:       c.chiaConfig.SelectedNetwork,
+		NetworkID:       c.chikConfig.SelectedNetwork,
 		ProtocolVersion: protocols.ProtocolVersion,
 		SoftwareVersion: "2.0.0",
 		ServerPort:      c.peerPort,

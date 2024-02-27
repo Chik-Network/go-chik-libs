@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// Bytes is a wrapper around []byte that marshals down to hex and more closely matches types in chia-blockchain
+// Bytes is a wrapper around []byte that marshals down to hex and more closely matches types in chik-blockchain
 type Bytes []byte
 
 // String Converts to hex string

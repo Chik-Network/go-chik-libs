@@ -1,10 +1,10 @@
-# Go Chia RPC
+# Go Chik RPC
 
-Library for interacting with Chia RPC. Supports both HTTP and Websocket communications.
+Library for interacting with Chik RPC. Supports both HTTP and Websocket communications.
 
 ## Usage
 
-When creating a new client, chia configuration will automatically be read from `CHIA_ROOT`. If chia is installed for the same user go-chia-rpc is running as, the config should be automatically discovered if it is in the default location. If the config is in a non-standard location, ensure `CHIA_ROOT` environment variable is set to the same value that is used for chia-blockchain.
+When creating a new client, chik configuration will automatically be read from `CHIK_ROOT`. If chik is installed for the same user go-chik-rpc is running as, the config should be automatically discovered if it is in the default location. If the config is in a non-standard location, ensure `CHIK_ROOT` environment variable is set to the same value that is used for chik-blockchain.
 
 ### HTTP Mode
 
@@ -14,7 +14,7 @@ To use HTTP mode, create a new client and specify `ConnectionModeHTTP`:
 package main
 
 import (
-	"github.com/chia-network/go-chia-libs/pkg/rpc"
+	"github.com/chik-network/go-chik-libs/pkg/rpc"
 )
 
 func main() {
@@ -33,17 +33,17 @@ To provide a manual config struct instead of using AutoConfig, use something lik
 package main
 
 import (
-	"github.com/chia-network/go-chia-libs/pkg/config"
-	"github.com/chia-network/go-chia-libs/pkg/rpc"
+	"github.com/chik-network/go-chik-libs/pkg/config"
+	"github.com/chik-network/go-chik-libs/pkg/rpc"
 )
 
 func main() {
-	client, err := rpc.NewClient(rpc.ConnectionModeHTTP, rpc.WithManualConfig(config.ChiaConfig{
-		ChiaRoot: "/path/to/.chia",
+	client, err := rpc.NewClient(rpc.ConnectionModeHTTP, rpc.WithManualConfig(config.ChikConfig{
+		ChikRoot: "/path/to/.chik",
 		FullNode: config.FullNodeConfig{
 			PortConfig: config.PortConfig{
-				Port:    8444,
-				RPCPort: 8555,
+				Port:    9678,
+				RPCPort: 9789,
 			},
 			SSL: config.SSLConfig{
 				PrivateCRT: "config/ssl/full_node/private_full_node.crt",
@@ -62,7 +62,7 @@ To use Websocket mode, specify ConnectionModeWebsocket when creating the client:
 package main
 
 import (
-	"github.com/chia-network/go-chia-libs/pkg/rpc"
+	"github.com/chik-network/go-chik-libs/pkg/rpc"
 )
 
 func main() {
@@ -86,8 +86,8 @@ package main
 
 import (
 	"log"
-	"github.com/chia-network/go-chia-libs/pkg/rpc"
-	"github.com/chia-network/go-chia-libs/pkg/types"
+	"github.com/chik-network/go-chik-libs/pkg/rpc"
+	"github.com/chik-network/go-chik-libs/pkg/types"
 )
 
 func main() {
@@ -114,8 +114,8 @@ package main
 import (
 	"log"
 
-	"github.com/chia-network/go-chia-libs/pkg/rpc"
-	"github.com/chia-network/go-chia-libs/pkg/types"
+	"github.com/chik-network/go-chik-libs/pkg/rpc"
+	"github.com/chik-network/go-chik-libs/pkg/types"
 )
 
 func main() {
@@ -140,7 +140,7 @@ There are two helper functions to subscribe to events that come over the websock
 
 `client.SubscribeSelf()` - Calling this method subscribes to response events for any requests made from this client
 
-`client.Subscribe(service)` - Calling this method, with an appropriate service, subscribes to any events that chia may generate that are not necessarily in responses to requests made from this client (for instance, `metrics` events fire when relevant updates are available that may impact metrics services)
+`client.Subscribe(service)` - Calling this method, with an appropriate service, subscribes to any events that chik may generate that are not necessarily in responses to requests made from this client (for instance, `metrics` events fire when relevant updates are available that may impact metrics services)
 
 ### Get Transactions
 
@@ -227,8 +227,8 @@ Gets the estimated network space and formats it to a readable version using Form
 //import (
 //    "log"
 //
-//    "github.com/chia-network/go-chia-libs/pkg/rpc"
-//    "github.com/chia-network/go-chia-libs/pkg/util"
+//    "github.com/chik-network/go-chik-libs/pkg/rpc"
+//    "github.com/chik-network/go-chik-libs/pkg/util"
 //)
 
 state, _, err := client.FullNodeService.GetBlockchainState()

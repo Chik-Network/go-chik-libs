@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 )
 
-// SerializedProgram An opaque representation of a clvm program. It has a more limited interface than a full SExp
-// https://github.com/Chia-Network/chia-blockchain/blob/main/chia/types/blockchain_format/program.py#L232
+// SerializedProgram An opaque representation of a klvm program. It has a more limited interface than a full SExp
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/types/blockchain_format/program.py#L232
 type SerializedProgram Bytes
 
 // MarshalJSON custom hex marshaller
