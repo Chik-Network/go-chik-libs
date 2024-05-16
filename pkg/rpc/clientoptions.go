@@ -1,12 +1,14 @@
 package rpc
 
 import (
+	"log/slog"
 	"net/url"
 	"time"
 
 	"github.com/chik-network/go-chik-libs/pkg/config"
 	"github.com/chik-network/go-chik-libs/pkg/httpclient"
 	"github.com/chik-network/go-chik-libs/pkg/rpcinterface"
+	"github.com/chik-network/go-chik-libs/pkg/websocketclient"
 )
 
 // WithAutoConfig automatically loads chik config from CHIK_ROOT
@@ -20,6 +22,14 @@ func WithAutoConfig() rpcinterface.ConfigOptionFunc {
 func WithManualConfig(cfg config.ChikConfig) rpcinterface.ConfigOptionFunc {
 	return func() (*config.ChikConfig, error) {
 		return &cfg, nil
+	}
+}
+
+// WithSyncWebsocket is a helper to making the client and calling SetSyncMode to set the client to sync mode by default
+func WithSyncWebsocket() rpcinterface.ClientOptionFunc {
+	return func(c rpcinterface.Client) error {
+		c.SetSyncMode()
+		return nil
 	}
 }
 
@@ -46,11 +56,20 @@ func WithCache(validTime time.Duration) rpcinterface.ClientOptionFunc {
 // WithTimeout sets the timeout for the requests
 func WithTimeout(timeout time.Duration) rpcinterface.ClientOptionFunc {
 	return func(c rpcinterface.Client) error {
-		typed, ok := c.(*httpclient.HTTPClient)
-		if ok {
+		switch typed := c.(type) {
+		case *httpclient.HTTPClient:
+			typed.Timeout = timeout
+		case *websocketclient.WebsocketClient:
 			typed.Timeout = timeout
 		}
+		return nil
+	}
+}
 
+// WithLogHandler sets a slog compatible log handler to be used for logging
+func WithLogHandler(handler slog.Handler) rpcinterface.ClientOptionFunc {
+	return func(c rpcinterface.Client) error {
+		c.SetLogHandler(handler)
 		return nil
 	}
 }

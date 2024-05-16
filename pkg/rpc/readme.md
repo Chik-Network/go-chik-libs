@@ -75,7 +75,7 @@ func main() {
 
 Websockets function asynchronously and as such, there are a few implementation differences compared to using the simpler HTTP request/response pattern. You must define a handler function to process responses received over the websocket connection, and you must also specifically subscribe to the events the handler should receive.
 
-#### Handler Function
+#### Handler Functions
 
 Handler functions must use the following signature: `func handlerFunc(data *types.WebsocketResponse, err error)`. The function will be passed the data that was received from the websocket and an error.
 
@@ -106,13 +106,44 @@ func gotResponse(data *types.WebsocketResponse, err error) {
 }
 ```
 
-You may also use a blocking/synchronous handler function, if listening to websocket responses is all your main process is doing:
+#### Synchronous Mode
+
+If you want websockets to behave more like request/response style calls, you can enable sync mode.
+
+To make all calls sync by default, you can set an option on the client:
 
 ```go
 package main
 
 import (
-	"log"
+	"fmt"
+
+	"github.com/chik-network/go-chik-libs/pkg/rpc"
+)
+
+func main() {
+	client, err := rpc.NewClient(rpc.ConnectionModeWebsocket, rpc.WithAutoConfig(), rpc.WithSyncWebsocket())
+	if err != nil {
+		// error happened
+	}
+
+	netInfo, _, err := client.DaemonService.GetNetworkInfo(&rpc.GetNetworkInfoOptions{})
+	if err != nil {
+		// error happened
+	}
+
+	// netInfo has the actual network information, since we're running in sync mode
+	fmt.Println(netInfo.NetworkName.OrEmpty())
+}
+```
+
+You can also temporarily enable synchronous mode and then turn it back off
+
+```go
+package main
+
+import (
+	"fmt"
 
 	"github.com/chik-network/go-chik-libs/pkg/rpc"
 	"github.com/chik-network/go-chik-libs/pkg/types"
@@ -121,17 +152,33 @@ import (
 func main() {
 	client, err := rpc.NewClient(rpc.ConnectionModeWebsocket, rpc.WithAutoConfig())
 	if err != nil {
-		log.Fatalln(err.Error())
+		// error happened
 	}
 
-	client.ListenSync(gotResponse)
+	client.AddHandler(gotAsyncResponse)
 
-	// Other application logic here
+	client.SetSyncMode()
+
+	netInfo, _, err := client.DaemonService.GetNetworkInfo(&rpc.GetNetworkInfoOptions{})
+	if err != nil {
+		// error happened
+	}
+	fmt.Println(netInfo.NetworkName.OrEmpty())
+
+	client.SetAsyncMode()
 }
 
-func gotResponse(data *types.WebsocketResponse, err error) {
-	log.Printf("Received a `%s` command response\n", data.Command)
+func gotAsyncResponse(data *types.WebsocketResponse, err error) {
+	log.Printf("Received a `%s` async command response\n", data.Command)
 }
+```
+
+The output of this program will look something like the following. Note that both the async handler AND the sync response
+variables saw the event and were able to handle it.
+
+```shell
+Received a `get_network_info` command response
+mainnet
 ```
 
 #### Subscribing to Events
@@ -141,6 +188,53 @@ There are two helper functions to subscribe to events that come over the websock
 `client.SubscribeSelf()` - Calling this method subscribes to response events for any requests made from this client
 
 `client.Subscribe(service)` - Calling this method, with an appropriate service, subscribes to any events that chik may generate that are not necessarily in responses to requests made from this client (for instance, `metrics` events fire when relevant updates are available that may impact metrics services)
+
+## Logging
+
+By default, a slog compatible text logger set to INFO level will be used to log any information from the RPC clients.
+
+### Change Log Level
+
+To change the log level of the default logger, you can use a client option like the following example:
+
+```go
+package main
+
+import (
+	"github.com/chik-network/go-chik-libs/pkg/rpc"
+	"github.com/chik-network/go-chik-libs/pkg/rpcinterface"
+)
+
+func main() {
+	client, err := rpc.NewClient(
+		rpc.ConnectionModeWebsocket,
+		rpc.WithAutoConfig(),
+		rpc.WithLogHandler(rpcinterface.SlogDebug()),
+	)
+	if err != nil {
+		// an error occurred
+	}
+}
+```
+
+### Custom Log Handler
+
+The `rpc.WithLogHandler()` method accepts a `slog.Handler` interface. Any logger can be provided as long as it conforms to the interface.
+
+## Request Cache
+
+When using HTTP mode, there is an optional request cache that can be enabled with a configurable cache duration. To use the cache, initialize the client with the `rpc.WithCache()` option like the following example:
+
+```go
+client, err := rpc.NewClient(rpc.ConnectionModeHTTP, rpc.WithAutoConfig(), rpc.WithCache(60 * time.Second))
+if err != nil {
+	// error happened
+}
+```
+
+This example sets the cache time to 60 seconds. Any identical requests within the 60 seconds will be served from the local cache rather than making another RPC call.
+
+## Example RPC Calls
 
 ### Get Transactions
 
@@ -240,16 +334,3 @@ if state.BlockchainState.IsPresent() {
     log.Println(state.BlockchainState.MustGet().Space)
 }
 ```
-
-### Request Cache
-
-When using HTTP mode, there is an optional request cache that can be enabled with a configurable cache duration. To use the cache, initialize the client with the `rpc.WithCache()` option like the following example:
-
-```go
-client, err := rpc.NewClient(rpc.ConnectionModeHTTP, rpc.WithAutoConfig(), rpc.WithCache(60 * time.Second))
-if err != nil {
-	// error happened
-}
-```
-
-This example sets the cache time to 60 seconds. Any identical requests within the 60 seconds will be served from the local cache rather than making another RPC call.

@@ -6,11 +6,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"time"
 
 	"github.com/google/go-querystring/query"
+	"github.com/google/uuid"
 
 	"github.com/chik-network/go-chik-libs/pkg/config"
 	"github.com/chik-network/go-chik-libs/pkg/rpcinterface"
@@ -20,6 +22,7 @@ import (
 type HTTPClient struct {
 	config  *config.ChikConfig
 	baseURL *url.URL
+	logger  *slog.Logger
 
 	// If set > 0, will configure http requests with a cache
 	cacheValidTime time.Duration
@@ -50,12 +53,17 @@ type HTTPClient struct {
 	datalayerPort    uint16
 	datalayerKeyPair *tls.Certificate
 	datalayerClient  *http.Client
+
+	timelordPort    uint16
+	timelordKeyPair *tls.Certificate
+	timelordClient  *http.Client
 }
 
 // NewHTTPClient returns a new HTTP client that satisfies the rpcinterface.Client interface
 func NewHTTPClient(cfg *config.ChikConfig, options ...rpcinterface.ClientOptionFunc) (*HTTPClient, error) {
 	c := &HTTPClient{
 		config: cfg,
+		logger: slog.New(rpcinterface.SlogInfo()),
 
 		Timeout: 10 * time.Second, // Default, overridable with client option
 
@@ -65,6 +73,7 @@ func NewHTTPClient(cfg *config.ChikConfig, options ...rpcinterface.ClientOptionF
 		walletPort:    cfg.Wallet.RPCPort,
 		crawlerPort:   cfg.Seeder.CrawlerConfig.RPCPort,
 		datalayerPort: cfg.DataLayer.RPCPort,
+		timelordPort:  cfg.Timelord.RPCPort,
 	}
 
 	// Sets the default host. Can be overridden by client options
@@ -93,6 +102,11 @@ func (c *HTTPClient) SetBaseURL(url *url.URL) error {
 	c.baseURL = url
 
 	return nil
+}
+
+// SetLogHandler sets a slog compatible log handler
+func (c *HTTPClient) SetLogHandler(handler slog.Handler) {
+	c.logger = slog.New(handler)
 }
 
 // SetCacheValidTime sets how long cache should be valid for
@@ -239,6 +253,14 @@ func (c *HTTPClient) generateHTTPClientForService(service rpcinterface.ServiceTy
 			}
 		}
 		keyPair = c.datalayerKeyPair
+	case rpcinterface.ServiceTimelord:
+		if c.timelordKeyPair == nil {
+			c.timelordKeyPair, err = c.config.Timelord.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
+			if err != nil {
+				return nil, err
+			}
+		}
+		keyPair = c.timelordKeyPair
 	default:
 		return nil, fmt.Errorf("unknown service")
 	}
@@ -281,6 +303,8 @@ func (c *HTTPClient) portForService(service rpcinterface.ServiceType) uint16 {
 		port = c.crawlerPort
 	case rpcinterface.ServiceDataLayer:
 		port = c.datalayerPort
+	case rpcinterface.ServiceTimelord:
+		port = c.timelordPort
 	}
 
 	return port
@@ -294,6 +318,8 @@ func (c *HTTPClient) httpClientForService(service rpcinterface.ServiceType) (*ht
 	)
 
 	switch service {
+	case rpcinterface.ServiceDaemon:
+		return nil, fmt.Errorf("daemon RPC calls must be made with the websocket client")
 	case rpcinterface.ServiceFullNode:
 		if c.nodeClient == nil {
 			c.nodeClient, err = c.generateHTTPClientForService(rpcinterface.ServiceFullNode)
@@ -342,6 +368,14 @@ func (c *HTTPClient) httpClientForService(service rpcinterface.ServiceType) (*ht
 			}
 		}
 		client = c.datalayerClient
+	case rpcinterface.ServiceTimelord:
+		if c.timelordClient == nil {
+			c.timelordClient, err = c.generateHTTPClientForService(rpcinterface.ServiceTimelord)
+			if err != nil {
+				return nil, err
+			}
+		}
+		client = c.timelordClient
 	}
 
 	if client == nil {
@@ -353,26 +387,37 @@ func (c *HTTPClient) httpClientForService(service rpcinterface.ServiceType) (*ht
 
 // The following are here to satisfy the interface, but are not used by the HTTP client
 
-// SubscribeSelf subscribes to events in response to requests from this service
-// Not applicable on the HTTP connection
+// SubscribeSelf does not apply to the HTTP Client
 func (c *HTTPClient) SubscribeSelf() error {
-	return nil
+	return fmt.Errorf("subscriptions are not supported on the HTTP client - websockets are required for subscriptions")
 }
 
-// Subscribe adds a subscription to events from a particular service
+// Subscribe does not apply to the HTTP Client
 // Not applicable on the HTTP connection
 func (c *HTTPClient) Subscribe(service string) error {
-	return nil
+	return fmt.Errorf("subscriptions are not supported on the HTTP client - websockets are required for subscriptions")
 }
 
-// ListenSync Listens for async responses over the connection in a synchronous fashion, blocking anything else
-// Not applicable on the HTTP connection
-func (c *HTTPClient) ListenSync(handler rpcinterface.WebsocketResponseHandler) error {
-	return nil
+// AddHandler does not apply to HTTP Client
+func (c *HTTPClient) AddHandler(handler rpcinterface.WebsocketResponseHandler) (uuid.UUID, error) {
+	return uuid.Nil, fmt.Errorf("handlers are not supported on the HTTP client - reponses are returned directly from the calling functions")
 }
 
-// AddDisconnectHandler Not applicable to the HTTP client
+// RemoveHandler does not apply to HTTP Client
+func (c *HTTPClient) RemoveHandler(handlerID uuid.UUID) {}
+
+// AddDisconnectHandler does not apply to the HTTP Client
 func (c *HTTPClient) AddDisconnectHandler(onDisconnect rpcinterface.DisconnectHandler) {}
 
-// AddReconnectHandler Not applicable to the HTTP client
+// AddReconnectHandler does not apply to the HTTP Client
 func (c *HTTPClient) AddReconnectHandler(onReconnect rpcinterface.ReconnectHandler) {}
+
+// SetSyncMode does not apply to the HTTP Client
+func (c *HTTPClient) SetSyncMode() {
+	c.logger.Debug("Sync mode is default for HTTP client. SetSyncMode call is ignored")
+}
+
+// SetAsyncMode does not apply to the HTTP Client
+func (c *HTTPClient) SetAsyncMode() {
+	c.logger.Debug("Async mode is not applicable to the HTTP client. SetAsyncMode call is ignored")
+}

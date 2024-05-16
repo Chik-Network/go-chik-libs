@@ -8,9 +8,20 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: golang:1.21.7
+    container: golang:1
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
+      - name: Get latest chikvdf libs
+        run: |
+          apt-get update && apt-get install -y unzip
+          LATEST_CHIKVDF=$(curl -s https://latest.cmm.io/chikvdf)
+          echo "Latest chikvdf is: $LATEST_CHIKVDF"
+          mkdir chikvdfc
+          cd chikvdfc || exit 1
+          wget https://github.com/Chik-Network/chikvdf/releases/download/$LATEST_CHIKVDF/chikvdfc-ubuntu-intel.zip
+          unzip chikvdfc-ubuntu-intel.zip
+          echo "CGO_CFLAGS=-I${GITHUB_WORKSPACE}/chikvdfc/chikvdfc-ubuntu-intel" >> "$GITHUB_ENV"
 
       - name: Test
-        run: make test-coverage
+        run: make test
