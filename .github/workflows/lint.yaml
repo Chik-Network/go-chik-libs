@@ -15,7 +15,7 @@ jobs:
       - name: Get latest chikvdf libs
         run: |
           apt-get update && apt-get install -y unzip
-          LATEST_CHIKVDF=$(curl -s https://latest.cmm.io/chikvdf)
+          LATEST_CHIKVDF=$(curl -Ls "https://api.github.com/repos/Chik-Network/chikvdf/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
           echo "Latest chikvdf is: $LATEST_CHIKVDF"
           mkdir chikvdfc
           cd chikvdfc || exit 1
