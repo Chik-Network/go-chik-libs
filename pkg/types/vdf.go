@@ -1,17 +1,19 @@
 package types
 
 // VDFInfo VDF Info
-// https://github.com/Chik-Network/chik_rs/blob/main/crates/chik-protocol/src/vdf.rs#L7
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/types/blockchain_format/vdf.py#L49
+// @TODO Streamable
 type VDFInfo struct {
-	Challenge          Bytes32           `json:"challenge" streamable:""`
-	NumberOfIterations uint64            `json:"number_of_iterations" streamable:""`
-	Output             ClassgroupElement `json:"output" streamable:""`
+	Challenge          Bytes32           `json:"challenge"`
+	NumberOfIterations uint64            `json:"number_of_iterations"`
+	Output             ClassgroupElement `json:"output"`
 }
 
 // VDFProof VDF Proof
-// https://github.com/Chik-Network/chik_rs/blob/main/crates/chik-protocol/src/vdf.rs#L14
+// https://github.com/Chik-Network/chik-blockchain/blob/main/chik/types/blockchain_format/vdf.py#L57
+// @TODO Streamable
 type VDFProof struct {
-	WitnessType          uint8 `json:"witness_type" streamable:""`
-	Witness              Bytes `json:"witness" streamable:""`
-	NormalizedToIdentity bool  `json:"normalized_to_identity" streamable:""`
+	WitnessType          uint8 `json:"witness_type"`
+	Witness              Bytes `json:"witness"`
+	NormalizedToIdentity bool  `json:"normalized_to_identity"`
 }
