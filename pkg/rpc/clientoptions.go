@@ -25,6 +25,13 @@ func WithManualConfig(cfg config.ChikConfig) rpcinterface.ConfigOptionFunc {
 	}
 }
 
+// WithPublicConfig client option func for using public HTTP(s) servers
+func WithPublicConfig() rpcinterface.ConfigOptionFunc {
+	return func() (*config.ChikConfig, error) {
+		return &config.ChikConfig{}, nil
+	}
+}
+
 // WithSyncWebsocket is a helper to making the client and calling SetSyncMode to set the client to sync mode by default
 func WithSyncWebsocket() rpcinterface.ClientOptionFunc {
 	return func(c rpcinterface.Client) error {

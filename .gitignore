@@ -146,3 +146,7 @@ main
 bin/
 test/
 .idea/*
+/*.crt
+/*.key
+/test-cert-gen
+/pkg/config/config.yml

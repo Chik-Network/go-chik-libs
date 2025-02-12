@@ -31,6 +31,8 @@ import (
 	"math"
 	"math/big"
 	"math/bits"
+
+	"gopkg.in/yaml.v3"
 )
 
 // Uint128Zero is a zero-valued uint128.
@@ -462,9 +464,44 @@ func (u *Uint128) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// UnmarshalYAML Uint128 from yaml
+func (u *Uint128) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var s string
+	err := unmarshal(&s)
+	if err != nil {
+		return err
+	}
+
+	if s == "null" || s == "" {
+		s = "0"
+	}
+
+	var z big.Int
+	_, ok := z.SetString(s, 10)
+	if !ok {
+		return fmt.Errorf("not a valid big integer: %s", s)
+	}
+
+	ui := Uint128FromBig(&z)
+	u.Lo = ui.Lo
+	u.Hi = ui.Hi
+
+	return nil
+}
+
 // MarshalJSON marshals the uint128 value to json
 func (u Uint128) MarshalJSON() ([]byte, error) {
 	return []byte(u.String()), nil
+}
+
+// MarshalYAML marshals the uint128 value to yaml
+func (u Uint128) MarshalYAML() (interface{}, error) {
+	// Return a YAML node with ScalarNode type to ensure the value is treated as a plain number and not quoted
+	return &yaml.Node{
+		Kind:  yaml.ScalarNode,
+		Value: u.Big().String(), // Use the string value without quotes
+		Style: yaml.TaggedStyle, // Prevent quoting
+	}, nil
 }
 
 // FitsInUint64 returns true if the value of the Uint128 will fit in Uint64

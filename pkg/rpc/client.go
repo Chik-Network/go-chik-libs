@@ -1,12 +1,15 @@
 package rpc
 
 import (
+	"log/slog"
 	"net/http"
+	"net/url"
 
 	"github.com/google/uuid"
 
 	"github.com/chik-network/go-chik-libs/pkg/config"
 	"github.com/chik-network/go-chik-libs/pkg/httpclient"
+	"github.com/chik-network/go-chik-libs/pkg/publichttpclient"
 	"github.com/chik-network/go-chik-libs/pkg/rpcinterface"
 	"github.com/chik-network/go-chik-libs/pkg/websocketclient"
 )
@@ -37,6 +40,9 @@ const (
 
 	// ConnectionModeWebsocket uses websockets for requests to the RPC server
 	ConnectionModeWebsocket
+
+	// ConnectionModePublicHTTP is for use with public http(s) servers that don't require cert auth but otherwise mirror the RPCs
+	ConnectionModePublicHTTP
 )
 
 // NewClient returns a new RPC Client
@@ -56,6 +62,8 @@ func NewClient(connectionMode ConnectionMode, configOption rpcinterface.ConfigOp
 		activeClient, err = httpclient.NewHTTPClient(cfg, options...)
 	case ConnectionModeWebsocket:
 		activeClient, err = websocketclient.NewWebsocketClient(cfg, options...)
+	case ConnectionModePublicHTTP:
+		activeClient, err = publichttpclient.NewHTTPClient(options...)
 	}
 	if err != nil {
 		return nil, err
@@ -81,11 +89,46 @@ func (c *Client) NewRequest(service rpcinterface.ServiceType, rpcEndpoint rpcint
 }
 
 // Do is a helper that wraps the activeClient's Do method
-func (c *Client) Do(req *rpcinterface.Request, v interface{}) (*http.Response, error) {
-	return c.activeClient.Do(req, v)
+func (c *Client) Do(req *rpcinterface.Request, v rpcinterface.IResponse) (*http.Response, error) {
+	resp, err := c.activeClient.Do(req, v)
+	if err != nil {
+		return resp, err
+	}
+	// resp will be nil in async websocket requests
+	// Any time we have a nil response, it's not a case of the RPC returning success: false, it's just a default value
+	if resp != nil && !v.IsSuccessful() {
+		return resp, &rpcinterface.ChikRPCError{Message: v.GetRPCError()}
+	}
+	return resp, nil
+}
+
+// Do Helper to create and send a new request for a given service and retain the proper types
+func Do[R rpcinterface.IResponse](service rpcinterface.Service, endpoint rpcinterface.Endpoint, opts any, v R) (R, *http.Response, error) {
+	req, err := service.NewRequest(endpoint, opts)
+	if err != nil {
+		return v, nil, err
+	}
+
+	resp, err := service.GetClient().Do(req, v)
+	return v, resp, err
+}
+
+// Close calls the close method on the active client
+func (c *Client) Close() error {
+	return c.activeClient.Close()
 }
 
 // The following has a bunch of methods that are currently only used for the websocket implementation
+
+// SetBaseURL satisfies the Client interface
+func (c *Client) SetBaseURL(url *url.URL) error {
+	return c.activeClient.SetBaseURL(url)
+}
+
+// SetLogHandler satisfies the client interface
+func (c *Client) SetLogHandler(handler slog.Handler) {
+	c.activeClient.SetLogHandler(handler)
+}
 
 // SubscribeSelf subscribes to responses to requests from this service
 // This is currently only useful for websocket mode

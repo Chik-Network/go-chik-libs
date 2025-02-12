@@ -14,7 +14,7 @@ jobs:
 
       - name: Get latest chikvdf libs
         run: |
-          apt-get update && apt-get install -y unzip
+          apt-get update && apt-get install -y unzip libgmp-dev
           LATEST_CHIKVDF=$(curl -Ls "https://api.github.com/repos/Chik-Network/chikvdf/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
           echo "Latest chikvdf is: $LATEST_CHIKVDF"
           mkdir chikvdfc
@@ -22,6 +22,7 @@ jobs:
           wget https://github.com/Chik-Network/chikvdf/releases/download/$LATEST_CHIKVDF/chikvdfc-ubuntu-intel.zip
           unzip chikvdfc-ubuntu-intel.zip
           echo "CGO_CFLAGS=-I${GITHUB_WORKSPACE}/chikvdfc/chikvdfc-ubuntu-intel" >> "$GITHUB_ENV"
+          echo "CGO_LDFLAGS=-L${GITHUB_WORKSPACE}/chikvdfc/chikvdfc-ubuntu-intel/static" >> "$GITHUB_ENV"
 
       - name: Test
         run: make test

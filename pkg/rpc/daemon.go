@@ -17,26 +17,19 @@ func (s *DaemonService) NewRequest(rpcEndpoint rpcinterface.Endpoint, opt interf
 	return s.client.NewRequest(rpcinterface.ServiceDaemon, rpcEndpoint, opt)
 }
 
-// Do is just a shortcut to the client's Do method
-func (s *DaemonService) Do(req *rpcinterface.Request, v interface{}) (*http.Response, error) {
-	return s.client.Do(req, v)
+// GetClient returns the active client for the service
+func (s *DaemonService) GetClient() rpcinterface.Client {
+	return s.client
 }
 
 // GetNetworkInfo gets the network name and prefix from the full node
 func (s *DaemonService) GetNetworkInfo(opts *GetNetworkInfoOptions) (*GetNetworkInfoResponse, *http.Response, error) {
-	request, err := s.NewRequest("get_network_info", opts)
-	if err != nil {
-		return nil, nil, err
-	}
+	return Do(s, "get_network_info", opts, &GetNetworkInfoResponse{})
+}
 
-	r := &GetNetworkInfoResponse{}
-
-	resp, err := s.Do(request, r)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return r, resp, nil
+// GetVersion returns the application version for the service
+func (s *DaemonService) GetVersion(opts *GetVersionOptions) (*GetVersionResponse, *http.Response, error) {
+	return Do(s, "get_version", opts, &GetVersionResponse{})
 }
 
 // GetKeysOptions configures how keys are returned in get_keys
@@ -46,23 +39,95 @@ type GetKeysOptions struct {
 
 // GetKeysResponse response from get_keys RPC call
 type GetKeysResponse struct {
-	Response
+	rpcinterface.Response
 	Keys []types.KeyData `json:"keys"`
 }
 
 // GetKeys returns key information
 func (s *DaemonService) GetKeys(opts *GetKeysOptions) (*GetKeysResponse, *http.Response, error) {
-	request, err := s.NewRequest("get_keys", opts)
-	if err != nil {
-		return nil, nil, err
-	}
+	return Do(s, "get_keys", opts, &GetKeysResponse{})
+}
 
-	r := &GetKeysResponse{}
+// StartServiceOptions start service options
+type StartServiceOptions struct {
+	Service ServiceFullName `json:"service"`
+}
 
-	resp, err := s.Do(request, r)
-	if err != nil {
-		return nil, resp, err
-	}
+// StartServiceResponse start service response
+type StartServiceResponse struct {
+	rpcinterface.Response
+	Service ServiceFullName `json:"service"`
+}
 
-	return r, resp, nil
+// StartService starts the given service
+func (s *DaemonService) StartService(opts *StartServiceOptions) (*StartServiceResponse, *http.Response, error) {
+	return Do(s, "start_service", opts, &StartServiceResponse{})
+}
+
+// StopServiceOptions start service options
+type StopServiceOptions struct {
+	Service ServiceFullName `json:"service"`
+}
+
+// StopServiceResponse stop service response
+type StopServiceResponse struct {
+	rpcinterface.Response
+	Service ServiceFullName `json:"service"`
+}
+
+// StopService stops the given service
+func (s *DaemonService) StopService(opts *StopServiceOptions) (*StopServiceResponse, *http.Response, error) {
+	return Do(s, "stop_service", opts, &StopServiceResponse{})
+}
+
+// IsRunningOptions is service running options
+type IsRunningOptions struct {
+	Service ServiceFullName `json:"service"`
+}
+
+// IsRunningResponse is service running response
+type IsRunningResponse struct {
+	rpcinterface.Response
+	ServiceName ServiceFullName `json:"service_name"`
+	IsRunning   bool            `json:"is_running"`
+}
+
+// IsRunning returns whether a service is running
+func (s *DaemonService) IsRunning(opts *IsRunningOptions) (*IsRunningResponse, *http.Response, error) {
+	return Do(s, "is_running", opts, &IsRunningResponse{})
+}
+
+// RunningServicesResponse is service running response
+type RunningServicesResponse struct {
+	rpcinterface.Response
+	RunningServices []ServiceFullName `json:"running_services"`
+}
+
+// RunningServices returns all running services
+func (s *DaemonService) RunningServices() (*RunningServicesResponse, *http.Response, error) {
+	return Do(s, "running_services", nil, &RunningServicesResponse{})
+}
+
+// ExitResponse shows information about the services that were stopped
+type ExitResponse struct {
+	rpcinterface.Response
+	ServicesStopped []ServiceFullName `json:"services_stopped"`
+}
+
+// Exit tells the daemon to exit
+func (s *DaemonService) Exit() (*ExitResponse, *http.Response, error) {
+	return Do(s, "exit", nil, &ExitResponse{})
+}
+
+// DaemonDeleteAllKeysOpts options for delete all keys request
+type DaemonDeleteAllKeysOpts struct{}
+
+// DaemonDeleteAllKeysResponse response when deleting all keys
+type DaemonDeleteAllKeysResponse struct {
+	rpcinterface.Response
+}
+
+// DeleteAllKeys deletes all keys from the keychain
+func (s *DaemonService) DeleteAllKeys(opts *DaemonDeleteAllKeysOpts) (*DaemonDeleteAllKeysResponse, *http.Response, error) {
+	return Do(s, "delete_all_keys", opts, &DaemonDeleteAllKeysResponse{})
 }

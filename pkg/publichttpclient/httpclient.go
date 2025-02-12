@@ -1,8 +1,7 @@
-package httpclient
+package publichttpclient
 
 import (
 	"bytes"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -14,13 +13,12 @@ import (
 	"github.com/google/go-querystring/query"
 	"github.com/google/uuid"
 
-	"github.com/chik-network/go-chik-libs/pkg/config"
+	"github.com/chik-network/go-chik-libs/pkg/httpclient"
 	"github.com/chik-network/go-chik-libs/pkg/rpcinterface"
 )
 
 // HTTPClient connects to Chik RPC via standard HTTP requests
 type HTTPClient struct {
-	config  *config.ChikConfig
 	baseURL *url.URL
 	logger  *slog.Logger
 
@@ -30,50 +28,15 @@ type HTTPClient struct {
 	// Request timeout
 	Timeout time.Duration
 
-	nodePort    uint16
-	nodeKeyPair *tls.Certificate
-	nodeClient  *http.Client
-
-	farmerPort    uint16
-	farmerKeyPair *tls.Certificate
-	farmerClient  *http.Client
-
-	harvesterPort    uint16
-	harvesterKeyPair *tls.Certificate
-	harvesterClient  *http.Client
-
-	walletPort    uint16
-	walletKeyPair *tls.Certificate
-	walletClient  *http.Client
-
-	crawlerPort    uint16
-	crawlerKeyPair *tls.Certificate
-	crawlerClient  *http.Client
-
-	datalayerPort    uint16
-	datalayerKeyPair *tls.Certificate
-	datalayerClient  *http.Client
-
-	timelordPort    uint16
-	timelordKeyPair *tls.Certificate
-	timelordClient  *http.Client
+	nodeClient *http.Client
 }
 
-// NewHTTPClient returns a new HTTP client that satisfies the rpcinterface.Client interface
-func NewHTTPClient(cfg *config.ChikConfig, options ...rpcinterface.ClientOptionFunc) (*HTTPClient, error) {
+// NewHTTPClient returns a new HTTP client that satisfies the rpcinterface.Client interface for use with public RPC services
+func NewHTTPClient(options ...rpcinterface.ClientOptionFunc) (*HTTPClient, error) {
 	c := &HTTPClient{
-		config: cfg,
 		logger: slog.New(rpcinterface.SlogInfo()),
 
 		Timeout: 10 * time.Second, // Default, overridable with client option
-
-		nodePort:      cfg.FullNode.RPCPort,
-		farmerPort:    cfg.Farmer.RPCPort,
-		harvesterPort: cfg.Harvester.RPCPort,
-		walletPort:    cfg.Wallet.RPCPort,
-		crawlerPort:   cfg.Seeder.CrawlerConfig.RPCPort,
-		datalayerPort: cfg.DataLayer.RPCPort,
-		timelordPort:  cfg.Timelord.RPCPort,
 	}
 
 	// Sets the default host. Can be overridden by client options
@@ -121,8 +84,6 @@ func (c *HTTPClient) NewRequest(service rpcinterface.ServiceType, rpcEndpoint rp
 	method := http.MethodPost
 
 	u := *c.baseURL
-
-	u.Host = fmt.Sprintf("%s:%d", u.Host, c.portForService(service))
 
 	u.RawPath = fmt.Sprintf("/%s", rpcEndpoint)
 	u.Path = fmt.Sprintf("/%s", rpcEndpoint)
@@ -199,88 +160,12 @@ func (c *HTTPClient) Close() error {
 }
 
 func (c *HTTPClient) generateHTTPClientForService(service rpcinterface.ServiceType) (*http.Client, error) {
-	var (
-		keyPair *tls.Certificate
-		err     error
-	)
-
-	switch service {
-	case rpcinterface.ServiceFullNode:
-		if c.nodeKeyPair == nil {
-			c.nodeKeyPair, err = c.config.FullNode.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
-			if err != nil {
-				return nil, err
-			}
-		}
-		keyPair = c.nodeKeyPair
-	case rpcinterface.ServiceFarmer:
-		if c.farmerKeyPair == nil {
-			c.farmerKeyPair, err = c.config.Farmer.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
-			if err != nil {
-				return nil, err
-			}
-		}
-		keyPair = c.farmerKeyPair
-	case rpcinterface.ServiceHarvester:
-		if c.harvesterKeyPair == nil {
-			c.harvesterKeyPair, err = c.config.Harvester.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
-			if err != nil {
-				return nil, err
-			}
-		}
-		keyPair = c.harvesterKeyPair
-	case rpcinterface.ServiceWallet:
-		if c.walletKeyPair == nil {
-			c.walletKeyPair, err = c.config.Wallet.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
-			if err != nil {
-				return nil, err
-			}
-		}
-		keyPair = c.walletKeyPair
-	case rpcinterface.ServiceCrawler:
-		if c.crawlerKeyPair == nil {
-			c.crawlerKeyPair, err = c.config.Seeder.CrawlerConfig.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
-			if err != nil {
-				// Fall back to just using the full node certs in this case
-				// This should only happen on old installations that didn't have the crawler in the config initially
-				c.crawlerKeyPair, err = c.config.FullNode.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
-				if err != nil {
-					return nil, err
-				}
-			}
-		}
-		keyPair = c.crawlerKeyPair
-	case rpcinterface.ServiceDataLayer:
-		if c.datalayerKeyPair == nil {
-			c.datalayerKeyPair, err = c.config.DataLayer.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
-			if err != nil {
-				return nil, err
-			}
-		}
-		keyPair = c.datalayerKeyPair
-	case rpcinterface.ServiceTimelord:
-		if c.timelordKeyPair == nil {
-			c.timelordKeyPair, err = c.config.Timelord.SSL.LoadPrivateKeyPair(c.config.ChikRoot)
-			if err != nil {
-				return nil, err
-			}
-		}
-		keyPair = c.timelordKeyPair
-	default:
-		return nil, fmt.Errorf("unknown service")
-	}
-
 	var transport http.RoundTripper
 
-	transport = &http.Transport{
-		TLSClientConfig: &tls.Config{
-			Certificates:       []tls.Certificate{*keyPair},
-			InsecureSkipVerify: true, // Cert is apparently for chiknetwork.com - can't validate until it matches hostname
-		},
-	}
+	transport = &http.Transport{}
 
 	if c.cacheValidTime > 0 {
-		transport = NewCachedTransport(c.cacheValidTime, transport)
+		transport = httpclient.NewCachedTransport(c.cacheValidTime, transport)
 	}
 
 	client := &http.Client{
@@ -289,30 +174,6 @@ func (c *HTTPClient) generateHTTPClientForService(service rpcinterface.ServiceTy
 	}
 
 	return client, nil
-}
-
-// portForService returns the configured port for the service
-func (c *HTTPClient) portForService(service rpcinterface.ServiceType) uint16 {
-	var port uint16 = 0
-
-	switch service {
-	case rpcinterface.ServiceFullNode:
-		port = c.nodePort
-	case rpcinterface.ServiceFarmer:
-		port = c.farmerPort
-	case rpcinterface.ServiceHarvester:
-		port = c.harvesterPort
-	case rpcinterface.ServiceWallet:
-		port = c.walletPort
-	case rpcinterface.ServiceCrawler:
-		port = c.crawlerPort
-	case rpcinterface.ServiceDataLayer:
-		port = c.datalayerPort
-	case rpcinterface.ServiceTimelord:
-		port = c.timelordPort
-	}
-
-	return port
 }
 
 // httpClientForService returns the proper http client to use with the service
@@ -333,54 +194,6 @@ func (c *HTTPClient) httpClientForService(service rpcinterface.ServiceType) (*ht
 			}
 		}
 		client = c.nodeClient
-	case rpcinterface.ServiceFarmer:
-		if c.farmerClient == nil {
-			c.farmerClient, err = c.generateHTTPClientForService(rpcinterface.ServiceFarmer)
-			if err != nil {
-				return nil, err
-			}
-		}
-		client = c.farmerClient
-	case rpcinterface.ServiceHarvester:
-		if c.harvesterClient == nil {
-			c.harvesterClient, err = c.generateHTTPClientForService(rpcinterface.ServiceHarvester)
-			if err != nil {
-				return nil, err
-			}
-		}
-		client = c.harvesterClient
-	case rpcinterface.ServiceWallet:
-		if c.walletClient == nil {
-			c.walletClient, err = c.generateHTTPClientForService(rpcinterface.ServiceWallet)
-			if err != nil {
-				return nil, err
-			}
-		}
-		client = c.walletClient
-	case rpcinterface.ServiceCrawler:
-		if c.crawlerClient == nil {
-			c.crawlerClient, err = c.generateHTTPClientForService(rpcinterface.ServiceCrawler)
-			if err != nil {
-				return nil, err
-			}
-		}
-		client = c.crawlerClient
-	case rpcinterface.ServiceDataLayer:
-		if c.datalayerClient == nil {
-			c.datalayerClient, err = c.generateHTTPClientForService(rpcinterface.ServiceDataLayer)
-			if err != nil {
-				return nil, err
-			}
-		}
-		client = c.datalayerClient
-	case rpcinterface.ServiceTimelord:
-		if c.timelordClient == nil {
-			c.timelordClient, err = c.generateHTTPClientForService(rpcinterface.ServiceTimelord)
-			if err != nil {
-				return nil, err
-			}
-		}
-		client = c.timelordClient
 	}
 
 	if client == nil {

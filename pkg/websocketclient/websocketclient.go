@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -22,13 +23,12 @@ import (
 	"github.com/chik-network/go-chik-libs/pkg/util"
 )
 
-const origin string = "go-chik-rpc"
-
 // WebsocketClient connects to Chik RPC via websockets
 type WebsocketClient struct {
 	config  *config.ChikConfig
 	baseURL *url.URL
 	logger  *slog.Logger
+	origin  string
 
 	// Request timeout
 	Timeout time.Duration
@@ -39,6 +39,9 @@ type WebsocketClient struct {
 
 	conn *websocket.Conn
 	lock sync.Mutex
+
+	// listenCancel is the cancel method of the listen context to stop listening
+	listenCancel context.CancelFunc
 
 	// listenSyncActive is tracking whether a client has opted to temporarily listen in sync mode for ALL requests
 	listenSyncActive bool
@@ -64,6 +67,7 @@ func NewWebsocketClient(cfg *config.ChikConfig, options ...rpcinterface.ClientOp
 	c := &WebsocketClient{
 		config: cfg,
 		logger: slog.New(rpcinterface.SlogInfo()),
+		origin: fmt.Sprintf("go-chik-rpc-%d", time.Now().UnixNano()),
 
 		Timeout: 10 * time.Second, // Default, overridable with client option
 
@@ -133,7 +137,7 @@ func (c *WebsocketClient) NewRequest(service rpcinterface.ServiceType, rpcEndpoi
 // Do sends an RPC request via the websocket
 // *http.Response is always nil in this return in async mode
 // call SetSyncMode() to ensure the calls return the data in a synchronous fashion
-func (c *WebsocketClient) Do(req *rpcinterface.Request, v interface{}) (*http.Response, error) {
+func (c *WebsocketClient) Do(req *rpcinterface.Request, v rpcinterface.IResponse) (*http.Response, error) {
 	err := c.ensureConnection()
 	if err != nil {
 		return nil, fmt.Errorf("error ensuring connection: %w", err)
@@ -165,7 +169,7 @@ func (c *WebsocketClient) Do(req *rpcinterface.Request, v interface{}) (*http.Re
 	}
 	request := &types.WebsocketRequest{
 		Command:     string(req.Endpoint),
-		Origin:      origin,
+		Origin:      c.origin,
 		Destination: destination,
 		Data:        data,
 		RequestID:   util.GenerateRequestID(),
@@ -179,6 +183,17 @@ func (c *WebsocketClient) Do(req *rpcinterface.Request, v interface{}) (*http.Re
 	}
 
 	return c.responseHelper(request, v)
+}
+
+// Close closes the client/websocket
+func (c *WebsocketClient) Close() error {
+	if c.listenCancel != nil {
+		c.listenCancel()
+	}
+	if c.conn != nil {
+		return c.conn.Close()
+	}
+	return nil
 }
 
 // responseHelper implements the logic to either immediately return in async mode
@@ -238,7 +253,7 @@ func (c *WebsocketClient) responseHelper(request *types.WebsocketRequest, v inte
 // Different from Subscribe with a custom service - that is more for subscribing to built in events emitted by Chik
 // This call will subscribe `go-chik-rpc` origin for any requests we specifically make of the server
 func (c *WebsocketClient) SubscribeSelf() error {
-	return c.Subscribe(origin)
+	return c.Subscribe(c.origin)
 }
 
 // Subscribe adds a subscription to a particular service
@@ -391,6 +406,8 @@ func (c *WebsocketClient) ensureConnection() error {
 // passed to the handler to deal with
 func (c *WebsocketClient) listen() {
 	if !c.listenSyncActive {
+		var ctx context.Context
+		ctx, c.listenCancel = context.WithCancel(context.Background())
 		c.listenSyncActive = true
 		defer func() {
 			c.listenSyncActive = false
@@ -404,17 +421,23 @@ func (c *WebsocketClient) listen() {
 			for {
 				_, message, err := c.conn.ReadMessage()
 				if err != nil {
-					c.logger.Error("Error reading message on chik websocket", "error", err.Error())
-					if _, isCloseErr := err.(*websocket.CloseError); !isCloseErr {
-						c.logger.Debug("Chik websocket sent close message, attempting to close connection...")
-						closeConnErr := c.conn.Close()
-						if closeConnErr != nil {
-							c.logger.Error("Error closing chik websocket connection", "error", closeConnErr.Error())
+					select {
+					case <-ctx.Done():
+						return
+					default:
+						c.logger.Error("Error reading message on chik websocket", "error", err.Error())
+						var closeError *websocket.CloseError
+						if !errors.As(err, &closeError) {
+							c.logger.Debug("Chik websocket sent close message, attempting to close connection...")
+							closeConnErr := c.conn.Close()
+							if closeConnErr != nil {
+								c.logger.Error("Error closing chik websocket connection", "error", closeConnErr.Error())
+							}
 						}
+						c.conn = nil
+						c.reconnectLoop()
+						continue
 					}
-					c.conn = nil
-					c.reconnectLoop()
-					continue
 				}
 				messageChan <- message
 			}

@@ -2,12 +2,16 @@ package peerprotocol
 
 import (
 	"context"
+	"crypto/sha256"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/chik-network/go-chik-libs/pkg/types"
 
 	"github.com/gorilla/websocket"
 
@@ -24,6 +28,7 @@ type Connection struct {
 	peerPort    uint16
 	peerKeyPair *tls.Certificate
 	peerDialer  *websocket.Dialer
+	peerID      types.Bytes32
 
 	handshakeTimeout time.Duration
 	conn             *websocket.Conn
@@ -67,7 +72,10 @@ func NewConnection(ip *net.IP, options ...ConnectionOptionFunc) (*Connection, er
 		if err := c.loadChikConfig(); err != nil {
 			return nil, err
 		}
-		c.networkID = c.chikConfig.SelectedNetwork
+		if c.chikConfig.SelectedNetwork == nil {
+			return nil, errors.New("selected_network empty in config")
+		}
+		c.networkID = *c.chikConfig.SelectedNetwork
 	}
 
 	// Generate the websocket dialer
@@ -119,12 +127,29 @@ func (c *Connection) generateDialer() error {
 // ensureConnection ensures there is an open websocket connection
 func (c *Connection) ensureConnection() error {
 	if c.conn == nil {
-		u := url.URL{Scheme: "wss", Host: fmt.Sprintf("%s:%d", c.peerIP.String(), c.peerPort), Path: "/ws"}
+		host := fmt.Sprintf("%s:%d", c.peerIP.String(), c.peerPort)
+		if c.peerIP.To4() == nil {
+			host = fmt.Sprintf("[%s]:%d", c.peerIP.String(), c.peerPort)
+		}
+		u := url.URL{Scheme: "wss", Host: host, Path: "/ws"}
 		var err error
 		c.conn, _, err = c.peerDialer.Dial(u.String(), nil)
 		if err != nil {
 			return err
 		}
+
+		tlsConn, ok := c.conn.NetConn().(*tls.Conn)
+		if !ok {
+			return fmt.Errorf("could not get tls.Conn from websocket")
+		}
+
+		// Access the connection state
+		state := tlsConn.ConnectionState()
+		if len(state.PeerCertificates) == 0 {
+			return fmt.Errorf("no certificates in chain")
+		}
+
+		c.peerID = sha256.Sum256(state.PeerCertificates[0].Raw)
 	}
 
 	return nil
@@ -139,6 +164,16 @@ func (c *Connection) Close() {
 		}
 		c.conn = nil
 	}
+}
+
+// PeerID returns the Peer ID for the remote peer
+func (c *Connection) PeerID() (types.Bytes32, error) {
+	err := c.ensureConnection()
+	if err != nil {
+		return types.Bytes32{}, err
+	}
+
+	return c.peerID, nil
 }
 
 // Handshake performs the RPC handshake. This should be called before any other method

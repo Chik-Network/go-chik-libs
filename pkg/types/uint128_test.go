@@ -33,6 +33,9 @@ import (
 	"math/big"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v3"
+
 	"github.com/chik-network/go-chik-libs/pkg/types"
 )
 
@@ -512,4 +515,60 @@ func TestUint128_UnmarshalJSON_Null(t *testing.T) {
 	if structDef.Int128.String() != "0" {
 		t.Error("`null` did not unmarshal as zero")
 	}
+}
+
+func TestUint128_UnmarshalYAML(t *testing.T) {
+	yamldata := []byte(`int128: 18446744073709551616`)
+	structDef := &struct {
+		Int128 types.Uint128 `yaml:"int128"`
+	}{}
+	err := yaml.Unmarshal(yamldata, structDef)
+	if err != nil {
+		t.Error(err)
+	}
+	if structDef.Int128.String() != "18446744073709551616" {
+		t.Error("value did not parse correctly")
+	}
+}
+
+func TestUint128_UnmarshalYAML_Null(t *testing.T) {
+	yamldata := []byte(`int128: null`)
+	structDef := &struct {
+		Int128 types.Uint128 `yaml:"int128"`
+	}{}
+	err := yaml.Unmarshal(yamldata, structDef)
+	if err != nil {
+		t.Error(err)
+	}
+	if structDef.Int128.String() != "0" {
+		t.Error("`null` did not unmarshal as zero")
+	}
+}
+
+func TestNewUint128_MarshalJSON(t *testing.T) {
+	num := types.Uint128From64(12345)
+	out, err := json.Marshal(num)
+	assert.NoError(t, err)
+	assert.Equal(t, "12345", string(out))
+
+	bigInt := new(big.Int)
+	bigInt.SetString("18446744073709551616", 10)
+	num = types.Uint128FromBig(bigInt)
+	out, err = json.Marshal(num)
+	assert.NoError(t, err)
+	assert.Equal(t, "18446744073709551616", string(out))
+}
+
+func TestNewUint128_MarshalYAML(t *testing.T) {
+	num := types.Uint128From64(12345)
+	out, err := yaml.Marshal(num)
+	assert.NoError(t, err)
+	assert.Equal(t, "12345\n", string(out))
+
+	bigInt := new(big.Int)
+	bigInt.SetString("18446744073709551616", 10)
+	num = types.Uint128FromBig(bigInt)
+	out, err = yaml.Marshal(num)
+	assert.NoError(t, err)
+	assert.Equal(t, "18446744073709551616\n", string(out))
 }
