@@ -8,8 +8,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: golang:1.23
+    container: golang:1
     steps:
+      - name: Add safe Git directory
+        uses: Chik-Network/actions/git-mark-workspace-safe@main
+
       - uses: actions/checkout@v4
 
       - name: Get latest chikvdf libs
