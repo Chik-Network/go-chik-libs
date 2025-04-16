@@ -5,7 +5,6 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
-
 	// Need to embed the default config into the library
 	_ "embed"
 	"encoding/pem"

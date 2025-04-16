@@ -39,7 +39,7 @@ func LoadConfigAtRoot(configPath, rootPath string) (*ChikConfig, error) {
 		return nil, err
 	}
 
-	cfg, err := commonLoad(configBytes, rootPath)
+	cfg, err := LoadFromBytes(configBytes, rootPath)
 	if err != nil {
 		return nil, err
 	}
@@ -53,10 +53,12 @@ func LoadDefaultConfig() (*ChikConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	return commonLoad(initialConfig, rootPath)
+	return LoadFromBytes(initialConfig, rootPath)
 }
 
-func commonLoad(configBytes []byte, rootPath string) (*ChikConfig, error) {
+// LoadFromBytes loads a config from bytes.
+// You will typically want to use GetChikConfig(), LoadConfigAtRoot(), or LoadDefaultConfig() instead
+func LoadFromBytes(configBytes []byte, rootPath string) (*ChikConfig, error) {
 	config := &ChikConfig{}
 
 	configBytes = FixBackCompat(configBytes)
@@ -93,10 +95,9 @@ func (c *ChikConfig) Save() error {
 
 // SavePath saves the config at the given path
 func (c *ChikConfig) SavePath(configPath string) error {
-	c.unfillDatabasePath()
-	out, err := yaml.Marshal(c)
+	out, err := c.SaveBytes()
 	if err != nil {
-		return fmt.Errorf("error marshalling config: %w", err)
+		return err
 	}
 
 	err = os.WriteFile(configPath, out, 0655)
@@ -105,6 +106,16 @@ func (c *ChikConfig) SavePath(configPath string) error {
 	}
 
 	return nil
+}
+
+// SaveBytes marshalls the config back down to bytes
+func (c *ChikConfig) SaveBytes() ([]byte, error) {
+	c.unfillDatabasePath()
+	out, err := yaml.Marshal(c)
+	if err != nil {
+		return nil, fmt.Errorf("error marshalling config: %w", err)
+	}
+	return out, nil
 }
 
 // GetChikRootPath returns the root path for the chik installation
@@ -132,11 +143,15 @@ func (c *ChikConfig) GetFullPath(filename string) string {
 }
 
 func (c *ChikConfig) fillDatabasePath() {
-	c.FullNode.DatabasePath = strings.Replace(c.FullNode.DatabasePath, "CHALLENGE", *c.FullNode.SelectedNetwork, 1)
+	if c.FullNode.SelectedNetwork != nil {
+		c.FullNode.DatabasePath = strings.Replace(c.FullNode.DatabasePath, "CHALLENGE", *c.FullNode.SelectedNetwork, 1)
+	}
 }
 
 func (c *ChikConfig) unfillDatabasePath() {
-	c.FullNode.DatabasePath = strings.Replace(c.FullNode.DatabasePath, *c.FullNode.SelectedNetwork, "CHALLENGE", 1)
+	if c.FullNode.SelectedNetwork != nil {
+		c.FullNode.DatabasePath = strings.Replace(c.FullNode.DatabasePath, *c.FullNode.SelectedNetwork, "CHALLENGE", 1)
+	}
 }
 
 // dealWithAnchors swaps out the distinct sections of the config with pointers to a shared instance
