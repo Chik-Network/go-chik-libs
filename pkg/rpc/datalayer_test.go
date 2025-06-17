@@ -2,13 +2,12 @@ package rpc
 
 import (
 	"fmt"
-	"net/http"chik
-	"testing"chik
-
-	"github.com/chik-network/go-chik-libs/pkg/types"
 	"github.com/chik-network/go-chik-libs/pkg/rpcinterface"
+	"github.com/chik-network/go-chik-libs/pkg/types"
 	"github.com/samber/mo"
 	"github.com/stretchr/testify/require"
+	"net/http"
+	"testing"
 )
 
 func TestGetKeysValues(t *testing.T) {
